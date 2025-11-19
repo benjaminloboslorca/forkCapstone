@@ -161,11 +161,16 @@ STATIC_URL = '/static/'
 # Directorios donde Django busca archivos estáticos
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
-    BASE_DIR / 'miapp' / 'static',
 ]
+
 
 # Carpeta donde collectstatic recopila todos los archivos para producción
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 # Whitenoise para comprimir y servir archivos estáticos
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
