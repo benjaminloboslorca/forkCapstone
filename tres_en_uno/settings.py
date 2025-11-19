@@ -260,7 +260,9 @@ CSRF_COOKIE_SAMESITE = 'Strict'
 if not DEBUG:
     CSRF_COOKIE_SECURE = True
     CSRF_TRUSTED_ORIGINS = [
-        SITE_URL,
+        'https://*.railway.app',
+        'https://tresenunocultivos.cl',
+        'https://www.tresenunocultivos.cl',
     ]
 else:
     CSRF_COOKIE_SECURE = False
@@ -282,9 +284,17 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-# HTTPS/SSL Configuration (solo en producción)
+# ==============================================================================
+# HTTPS/SSL Configuration - CORREGIDO PARA RAILWAY
+# ==============================================================================
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
+    # Railway ya maneja HTTPS, así que NO forzamos redirección
+    SECURE_SSL_REDIRECT = False  # ← CAMBIO CRÍTICO
+    
+    # Pero confiamos en el proxy de Railway
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # Otras configuraciones de seguridad
     SECURE_HSTS_SECONDS = 31536000  # 1 año
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
@@ -292,6 +302,7 @@ if not DEBUG:
     SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
 else:
     SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = None
 
 # ==============================================================================
 # LOGGING
@@ -355,32 +366,3 @@ PAGINATION_PER_PAGE = 12
 
 # Timeouts
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
-
-# ==============================================================================
-# NOTAS IMPORTANTES
-# ==============================================================================
-
-"""
-Este archivo está configurado para funcionar en:
-
-1. DESARROLLO (Local):
-- DEBUG = True
-- PostgreSQL local
-- Sin SSL/HTTPS obligatorio
-- Archivos estáticos servidos por Django
-
-2. PRODUCCIÓN (Railway):
-- DEBUG = False (configurar en Railway)
-- PostgreSQL de Railway (DATABASE_URL)
-- SSL/HTTPS obligatorio
-- Archivos estáticos servidos por Whitenoise
-- ALLOWED_HOSTS dinámico
-
-Variables de entorno necesarias en Railway:
-- SECRET_KEY (nueva, diferente a la local)
-- DEBUG=False
-- DATABASE_URL (Railway lo crea automáticamente)
-- EMAIL_HOST_USER
-- EMAIL_HOST_PASSWORD
-- ALLOWED_HOSTS (opcional, se configura automáticamente)
-"""
