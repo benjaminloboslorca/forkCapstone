@@ -1,0 +1,422 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="utf-8">
+        <title>Tres En Uno - Cultivos Organicos - Productos</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="Free HTML Templates" name="keywords">
+        <meta content="Free HTML Templates" name="description">
+
+        <link href="{% static 'img/logo.jpg' %}" rel="icon">
+
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+            rel="stylesheet">
+
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+            rel="stylesheet">
+
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+        <style>
+        /* Estilos para los botones de filtro */
+        .filter-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        
+        .filter-pill {
+            padding: 10px 25px;
+            border: 2px solid #28a745;
+            background: white;
+            color: #28a745;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+        }
+        
+        .filter-pill:hover {
+            background: #28a745;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+        }
+        
+        .filter-pill.active {
+            background: #28a745;
+            color: white;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            padding: 50px;
+            font-size: 18px;
+            color: #28a745;
+        }
+        
+        .loading-spinner i {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+    </style>
+    </head>
+
+    <body>
+
+        {% include 'miapp/barrabase.html' %}
+
+        <div class="container-fluid page-header">
+            <div class="container">
+                <div
+                    class="d-flex flex-column align-items-center justify-content-center"
+                    style="min-height: 400px">
+                    <h3
+                        class="display-4 text-white text-uppercase">Productos</h3>
+                    <div class="d-inline-flex text-white">
+                        <p class="m-0 text-uppercase"><a class="text-white"
+                                href="{% url 'inicio' %}">Inicio</a></p>
+                        <i class="fa fa-angle-double-right pt-1 px-3"></i>
+                        <p class="m-0 text-uppercase">Productos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid py-5">
+            <div class="container pt-5 pb-3">
+                <div class="text-center mb-3 pb-3">
+                    <h6 class="text-primary text-uppercase"
+                        style="letter-spacing: 5px;" id="categoria-titulo">Todos
+                        los Productos</h6>
+                    <h1>Variedad y Calidad</h1>
+                </div>
+
+                <!-- Filtro de Categorías -->
+                <div class="filter-pills" id="filtro-categorias">
+                    <button class="filter-pill active" data-categoria
+                        onclick="filtrarPorCategoria('')">
+                        <i class="fa fa-th"></i> Todas
+                    </button>
+                    <!-- Las categorías se cargarán dinámicamente aquí -->
+                </div>
+
+                <!-- Contenedor de productos -->
+                <div id="productos-container">
+                    <!-- Spinner de carga -->
+                    <div class="loading-spinner">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando productos...</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {% include 'miapp/barrabaja.html' %}
+
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script
+            src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+        <script
+            src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+        <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+        <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+        <script src="{% static 'mail/jqBootstrapValidation.min.js' %}"></script>
+        <script src="{% static 'mail/contact.js' %}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
+
+        <script>
+    // Variables globales
+    let categoriaActual = '';
+    
+    // Cargar categorías y productos al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+        cargarCategorias();
+        cargarProductos('');
+    });
+    
+    // Función para cargar categorías desde la API
+    function cargarCategorias() {
+        fetch('/api/public/categories/')
+            .then(response => response.json())
+            .then(categorias => {
+                const contenedorFiltros = document.getElementById('filtro-categorias');
+                
+                // Agregar botones de categorías después del botón "Todas"
+                categorias.forEach(categoria => {
+                    const boton = document.createElement('button');
+                    boton.className = 'filter-pill';
+                    boton.setAttribute('data-categoria', categoria.nombre);
+                    boton.onclick = () => filtrarPorCategoria(categoria.nombre);
+                    boton.innerHTML = `<i class="fa fa-leaf"></i> ${categoria.nombre}`;
+                    contenedorFiltros.appendChild(boton);
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar categorías:', error);
+            });
+    }
+    
+    // Función para filtrar por categoría
+    function filtrarPorCategoria(nombreCategoria) {
+        categoriaActual = nombreCategoria;
+        
+        // Actualizar botones activos
+        document.querySelectorAll('.filter-pill').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.closest('.filter-pill').classList.add('active');
+        
+        // Actualizar título
+        const titulo = nombreCategoria ? nombreCategoria : 'Todos los Productos';
+        document.getElementById('categoria-titulo').textContent = titulo;
+        
+        // Cargar productos filtrados
+        cargarProductos(nombreCategoria);
+    }
+    
+    // Función para cargar productos
+    function cargarProductos(categoria) {
+        const contenedor = document.getElementById('productos-container');
+        
+        // Mostrar spinner
+        contenedor.innerHTML = `
+            <div class="loading-spinner">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>Cargando productos...</p>
+            </div>
+        `;
+        
+        // Construir URL con filtro
+        let url = '/api/public/products/';
+        if (categoria) {
+            url += `?categoria=${encodeURIComponent(categoria)}`;
+        }
+        
+        // Hacer petición a la API
+        fetch(url)
+            .then(response => response.json())
+            .then(productos => {
+                mostrarProductos(productos);
+            })
+            .catch(error => {
+                console.error('Error al cargar productos:', error);
+                contenedor.innerHTML = `
+                    <div class="col-12 text-center py-5">
+                        <i class="fa fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                        <h4 class="text-muted">Error al cargar productos</h4>
+                        <p class="text-muted">Por favor, intenta nuevamente.</p>
+                    </div>
+                `;
+            });
+    }
+    
+    // Función para mostrar productos en el HTML
+    function mostrarProductos(productos) {
+        const contenedor = document.getElementById('productos-container');
+        
+        if (productos.length === 0) {
+            contenedor.innerHTML = `
+                <div class="col-12 text-center py-5">
+                    <i class="fa fa-shopping-basket fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">No hay productos disponibles</h4>
+                    <p class="text-muted">Vuelve más tarde para ver nuestros productos frescos.</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '<div class="row">';
+        
+        productos.forEach(producto => {
+            const imagenUrl = producto.imagen_url || '/static/img/placeholder.png';
+            const stockClass = producto.stock_disponible > 0 ? 'text-success' : 'text-danger';
+            const stockText = producto.stock_disponible > 0 ? `${producto.stock_disponible} en stock` : 'Agotado';
+            
+            html += `
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="package-item bg-white mb-2" style="position: relative;">
+                        ${producto.tiene_oferta ? `
+                            <div style="position: absolute; top: 15px; right: 15px; z-index: 10; background: #dc3545; color: white; padding: 8px 15px; border-radius: 25px; font-weight: bold; font-size: 13px; box-shadow: 0 2px 8px rgba(220,53,69,0.4);">
+                                <i class="fa fa-tag"></i> ${producto.descuento_porcentaje}% OFF
+                            </div>
+                        ` : ''}
+                        
+                        <a href="/producto/${producto.id}/">
+                            <img class="img-fluid" src="${imagenUrl}" alt="${producto.nombre}" 
+                                style="cursor: pointer; transition: transform 0.3s; width: 100%; height: 250px; object-fit: contain; background: #f8f9fa;"
+                                onmouseover="this.style.transform='scale(1.05)'" 
+                                onmouseout="this.style.transform='scale(1)'">
+                        </a>
+                        
+                        <div class="p-4">
+                            <div class="d-flex justify-content-between mb-3">
+                                <small class="m-0">
+                                    <i class="fa fa-calendar-alt text-primary mr-2"></i>${producto.unidad_medida}
+                                </small>
+                                <small class="m-0 ${stockClass}">
+                                    <i class="fa fa-cubes mr-2"></i>${stockText}
+                                </small>
+                            </div>
+                            
+                            <a class="h5 text-decoration-none" href="/producto/${producto.id}/" 
+                            style="color: #333; transition: color 0.3s;"
+                            onmouseover="this.style.color='#28a745'" 
+                            onmouseout="this.style.color='#333'">
+                                ${producto.nombre}
+                            </a>
+                            
+                            <div class="border-top mt-4 pt-4">
+                                ${producto.tiene_oferta ? `
+                                    <div class="mb-3">
+                                        <span style="text-decoration: line-through; color: #999; font-size: 1rem; margin-right: 10px;">
+                                            $${Number(producto.precio_unitario).toLocaleString('es-CL')}
+                                        </span>
+                                        <span style="color: #dc3545; font-size: 1.8rem; font-weight: bold;">
+                                            $${Number(producto.precio_final).toLocaleString('es-CL')}
+                                        </span>
+                                        <div style="color: #28a745; font-size: 0.9rem; margin-top: 5px;">
+                                            <i class="fa fa-check-circle"></i> Ahorras $${Number(producto.ahorro).toLocaleString('es-CL')}
+                                        </div>
+                                    </div>
+                                ` : `
+                                    <div class="mb-3">
+                                        <h5 class="m-0" style="color: #28a745;">
+                                            $${Number(producto.precio_final).toLocaleString('es-CL')}
+                                        </h5>
+                                    </div>
+                                `}
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div></div>
+                                    <div class="d-flex flex-column">
+                                        <a href="/producto/${producto.id}/" class="btn btn-sm btn-primary mb-2" style="white-space: nowrap;">
+                                            <i class="fa fa-eye"></i> Ver Detalle
+                                        </a>
+                                        
+                                        ${producto.stock_disponible > 0 ? `
+                                            <button class="btn btn-sm btn-success agregar-carrito-btn" 
+                                                    data-producto-id="${producto.id}" 
+                                                    data-producto-nombre="${producto.nombre}" 
+                                                    style="white-space: nowrap;">
+                                                <i class="fa fa-shopping-cart"></i> Agregar
+                                            </button>
+                                        ` : `
+                                            <button class="btn btn-sm btn-secondary" disabled style="white-space: nowrap;">
+                                                <i class="fa fa-times"></i> Agotado
+                                            </button>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        contenedor.innerHTML = html;
+        
+        // Reinicializar event listeners para botones de agregar al carrito
+        inicializarBotonesCarrito();
+    }
+    
+    // Función para inicializar botones de agregar al carrito
+    function inicializarBotonesCarrito() {
+        const botonesAgregar = document.querySelectorAll('.agregar-carrito-btn');
+        
+        botonesAgregar.forEach(function(boton) {
+            boton.addEventListener('click', function() {
+                const productoId = this.getAttribute('data-producto-id');
+                const productoNombre = this.getAttribute('data-producto-nombre');
+                const botonOriginal = this;
+                
+                botonOriginal.disabled = true;
+                botonOriginal.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Agregando...';
+                
+                fetch('/api/cart/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({
+                        producto_id: productoId,
+                        cantidad: 1
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.carrito) {
+                        mostrarMensaje('✅ ' + productoNombre + ' agregado al carrito', 'success');
+                        
+                        if (typeof actualizarContadorCarrito === 'function') {
+                            actualizarContadorCarrito();
+                        }
+                    } else {
+                        mostrarMensaje('❌ ' + (data.error || 'Error al agregar al carrito'), 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    mostrarMensaje('❌ Error al agregar al carrito', 'error');
+                })
+                .finally(() => {
+                    botonOriginal.disabled = false;
+                    botonOriginal.innerHTML = '<i class="fa fa-shopping-cart"></i> Agregar';
+                });
+            });
+        });
+    }
+    
+    // Función para obtener el token CSRF
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Función para mostrar mensajes
+    function mostrarMensaje(mensaje, tipo) {
+        var alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-' + (tipo === 'success' ? 'success' : 'danger') + ' alert-dismissible fade show';
+        alertDiv.style.position = 'fixed';
+        alertDiv.style.top = '20px';
+        alertDiv.style.right = '20px';
+        alertDiv.style.zIndex = '9999';
+        alertDiv.style.minWidth = '300px';
+        alertDiv.innerHTML = mensaje + '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+        
+        document.body.appendChild(alertDiv);
+        
+        setTimeout(function() {
+            alertDiv.remove();
+        }, 3000);
+    }
+    </script>
+    </body>
+
+</html>

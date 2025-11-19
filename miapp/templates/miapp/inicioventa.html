@@ -1,0 +1,43 @@
+{% load static %}
+
+<div class="text-center mb-3 pb-3">
+    <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Hortalizas</h6>
+    <h1>Nuestros Productos Destacados</h1>
+</div>
+
+<div class="row">
+    {% for producto in productos %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="package-item bg-white mb-2">
+                
+                {# AQUI DEBE IR LA LOGICA DE LA IMAGEN CORRECTA (producto.imagen.imagen.url) #}
+                {% if producto.imagen %}
+                    <img class="img-fluid" src="{{ producto.imagen.imagen.url }}" alt="{{ producto.nombre }}">
+                {% else %}
+                    {# Usa una imagen de marcador o deja un espacio #}
+                    <img class="img-fluid" src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                {% endif %}
+
+                <div class="p-4">
+                    <div class="d-flex justify-content-between mb-3">
+                        <small class="m-0"><i class="fa fa-calendar-alt text-primary mr-2"></i>{{ producto.unidad_medida }}</small>
+                        <small class="m-0"><i class="fa fa-water text-primary mr-2"></i>{{ producto.stock_disponible }} en stock</small>
+                    </div>
+                    <a class="h5 text-decoration-none" href="">{{ producto.nombre }}</a>
+                    <p>{{ producto.descripcion }}</p>
+                    <div class="border-top mt-4 pt-4">
+                        <div class="d-flex justify-content-between">
+                            <h5 class="m-0">${{ producto.precio_unitario }}</h5>
+                            <a href="https://wa.me/56942865185?text=Hola%2C%20quiero%20m%C3%A1s%20informaci%C3%B3n%20sobre%20{{ producto.nombre }}" class="btn btn-primary mt-1">Comprar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{# Botón "Ver más Productos" #}
+<div class="text-center mt-4">
+    <a href="{% url 'listar_productos' %}" class="btn btn-primary py-3 px-5">Ver más Productos</a>
+</div>

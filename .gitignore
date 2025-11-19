@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Entorno virtual
+venv/
+env/
+
+# Base de datos
+*.sqlite3
+db.sqlite3.backup
+
+# Archivos sensibles
+.env
+*.log
+security.log
+
+# Archivos estáticos compilados
+staticfiles/
+
+# Media (opcional)
+# media/
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/

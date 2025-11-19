@@ -1,0 +1,162 @@
+{% load static %}
+
+<!-- Footer Start -->
+<div class="container-fluid bg-dark text-white-50 py-5 px-sm-3 px-lg-5"
+    style="margin-top: 90px;">
+    <div class="row pt-5">
+        <div class="col-lg-3 col-md-6 mb-5">
+            <a href="{% url 'inicio' %}" class="navbar-brand">
+                <h1 class="text-white"><span class="text-white">Tres en</span>
+                    <span style="color: #28a745;">Uno</span></h1>
+            </a>
+            <p class="m-0">Cultivos Orgánicos</p>
+            
+            <!-- Botón movido aquí desde Horarios -->
+            <a href="{% static 'pdf/politicas.pdf' %}" target="_blank"
+                class="btn btn-primary btn-block border-0 py-3 mt-3"
+                style="background: #28a745;">
+                <i class="fa fa-shield-alt mr-2"></i>Políticas de Privacidad
+            </a>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-5">
+            <h5 class="text-white text-uppercase mb-4"
+                style="letter-spacing: 5px;">Servicios</h5>
+            <div class="d-flex flex-column justify-content-start">
+                <a class="text-white-50 mb-2" href="{% url 'nosotros' %}"><i
+                        class="fa fa-angle-right mr-2"></i>Nosotros</a>
+                <a class="text-white-50 mb-2"
+                    href="{% url 'listar_productos' %}"><i
+                        class="fa fa-angle-right mr-2"></i>Productos</a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-5">
+            <h5 class="text-white text-uppercase mb-4"
+                style="letter-spacing: 5px;">Nuestro Contacto</h5>
+            <p><i class="fa fa-map-marker-alt mr-2"></i>Los Vilos, Región de
+                Coquimbo.</p>
+            <p><i class="fa fa-phone-alt mr-2"></i>+56 9 4286 5185</p>
+            <p><i class="fa fa-envelope mr-2"></i>ventas.tresenuno@gmail.com</p>
+            <p><i
+                    class="fa fa-envelope mr-2"></i>gestion.tresenuno@gmail.com</p>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-5">
+            <h5 class="text-white text-uppercase mb-4"
+                style="letter-spacing: 5px;">Horarios</h5>
+            <p><i class="fa fa-clock mr-2"></i>Lun - Vie: 9:00 AM - 6:00 PM</p>
+            <p><i class="fa fa-clock mr-2"></i>Sábado: 10:00 AM - 2:00 PM</p>
+            <p><i class="fa fa-clock mr-2"></i>Domingo: Cerrado</p>
+            <!-- Botón eliminado de aquí -->
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid bg-dark text-white border-top py-4 px-sm-3 px-md-5"
+    style="border-color: rgba(256, 256, 256, .1) !important;">
+    <div class="row">
+        <div class="col-lg-5 text-center text-md-left mb-3 mb-md-0">
+            <p class="m-0 text-white-50">Copyright &copy; <a href="#">Tres En
+                    Uno</a>. All Rights Reserved.</p>
+        </div>
+        <div class="col-lg-7 text-center text-md-right"
+            style="padding-right: 10px;">
+            <p class="m-0 text-white-50" style="font-size: 12.5px;">
+                <span style="color: #9ca3af;">Desarrollado por </span>
+                <a
+                    href="https://www.linkedin.com/in/celine-toledo-jorquera-98b409251/"
+                    target="_blank" rel="noopener"
+                    style="color: #fff; text-decoration: none; transition: color 0.3s;"
+                    onmouseover="this.style.color='#28a745'"
+                    onmouseout="this.style.color='#fff'">
+                    <strong>Celine Toledo</strong>
+                </a>
+                <span style="font-size: 11.5px; color: #6c757d;"> (Scrum
+                    Master)</span>,
+                <a
+                    href="https://www.linkedin.com/in/catalina-berrios-salazar-bb2160224/?originalSubdomain=cl"
+                    target="_blank" rel="noopener"
+                    style="color: #fff; text-decoration: none; transition: color 0.3s;"
+                    onmouseover="this.style.color='#28a745'"
+                    onmouseout="this.style.color='#fff'">
+                    <strong>Catalina Berrios</strong>
+                </a>
+                <span style="font-size: 11.5px; color: #6c757d;"> (Frontend
+                    Developer)</span>,
+                <a href="https://www.linkedin.com/in/benjaminlobos/"
+                    target="_blank" rel="noopener"
+                    style="color: #fff; text-decoration: none; transition: color 0.3s;"
+                    onmouseover="this.style.color='#28a745'"
+                    onmouseout="this.style.color='#fff'">
+                    <strong>Benjamin Lobos</strong>
+                </a>
+                <span style="font-size: 11.5px; color: #6c757d;"> (DevOps
+                    Engineer)</span>
+            </p>
+        </div>
+    </div>
+</div>
+<!-- Footer End -->
+
+<!-- Back to Top -->
+<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i
+        class="fa fa-angle-double-up"></i></a>
+
+<script>
+// Esperar a que el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', function() {
+    // Buscar el botón del chatbot
+    var chatButton = document.querySelector('.cb-toggle-button');
+    
+    if (chatButton) {
+        // Ajustar la posición del botón
+        chatButton.style.bottom = '140px';
+        chatButton.style.right = '20px';
+    }
+    
+    // También ajustar el contenedor del chat si existe
+    var chatContainer = document.getElementById('cb-root');
+    if (chatContainer) {
+        chatContainer.style.bottom = '140px';
+    }
+    
+    // Ajustar AMBOS botones "Back to Top"
+    var backToTopButtons = document.querySelectorAll('.back-to-top');
+    backToTopButtons.forEach(function(button) {
+        button.style.bottom = '80px';
+        button.style.right = '20px';
+    });
+});
+</script>
+
+<style>
+/* Forzar la posición de los botones flotantes */
+.cb-toggle-button,
+button[aria-label="Abrir chat"] {
+    bottom: 140px !important;
+    right: 20px !important;
+    z-index: 1000;
+}
+
+/* Ambos botones de "volver arriba" */
+.back-to-top {
+    bottom: 80px !important;
+    right: 20px !important;
+    z-index: 999;
+}
+
+/* Para móviles */
+@media (max-width: 768px) {
+    .cb-toggle-button,
+    button[aria-label="Abrir chat"] {
+        bottom: 130px !important;
+        right: 15px !important;
+    }
+    
+    .back-to-top {
+        bottom: 70px !important;
+        right: 15px !important;
+    }
+}
+</style>

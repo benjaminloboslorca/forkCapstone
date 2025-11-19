@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Registro - Tres En Uno</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        padding: 20px;
+    }
+
+    .registro-card {
+        width: 100%;
+        max-width: 450px;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 40px 35px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo-section {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .logo-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+    }
+
+    .logo-section h1 {
+        font-size: 24px;
+        color: #1a1a1a;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .logo-section p {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .input-wrapper input:focus {
+        outline: none;
+        border-color: #28a745;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(40, 167, 69, 0.1);
+    }
+
+    .input-wrapper input::placeholder {
+        color: #adb5bd;
+    }
+
+    .input-wrapper input.valido {
+        border-color: #28a745;
+    }
+
+    .input-wrapper input.invalido {
+        border-color: #dc3545;
+    }
+
+    .btn-registro {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-registro:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    }
+
+    .btn-registro:active {
+        transform: translateY(0);
+    }
+
+    .btn-registro:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .links-section {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .links-section p {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .links-section a {
+        color: #28a745;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+    }
+
+    .links-section a:hover {
+        color: #20c997;
+        text-decoration: underline;
+    }
+
+    #mensaje {
+        margin-top: 15px;
+        padding: 12px;
+        border-radius: 10px;
+        font-size: 14px;
+        text-align: center;
+        display: none;
+    }
+
+    #mensaje.exito {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+        display: block;
+    }
+
+    #mensaje.error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        display: block;
+    }
+
+    /* ⭐ NUEVO: Mensajes de validación en tiempo real */
+    .validacion-mensaje {
+        font-size: 13px;
+        margin-top: 6px;
+        display: none;
+    }
+
+    .validacion-mensaje.exito {
+        color: #28a745;
+        display: block;
+    }
+
+    .validacion-mensaje.error {
+        color: #dc3545;
+        display: block;
+    }
+
+    .validacion-mensaje.info {
+        color: #6c757d;
+        display: block;
+    }
+
+    /* ⭐ NUEVO: Indicador de fortaleza de contraseña */
+    .password-strength {
+        margin-top: 8px;
+        display: none;
+    }
+
+    .password-strength.show {
+        display: block;
+    }
+
+    .strength-bar {
+        height: 4px;
+        background: #e0e0e0;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 5px;
+    }
+
+    .strength-bar-fill {
+        height: 100%;
+        width: 0%;
+        transition: all 0.3s ease;
+    }
+
+    .strength-bar-fill.debil {
+        width: 33%;
+        background: #dc3545;
+    }
+
+    .strength-bar-fill.media {
+        width: 66%;
+        background: #ffc107;
+    }
+
+    .strength-bar-fill.fuerte {
+        width: 100%;
+        background: #28a745;
+    }
+
+    .strength-text {
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .strength-text.debil {
+        color: #dc3545;
+    }
+
+    .strength-text.media {
+        color: #ffc107;
+    }
+
+    .strength-text.fuerte {
+        color: #28a745;
+    }
+
+    /* Grid para dos columnas en pantallas grandes */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+        .registro-card {
+            padding: 30px 25px;
+        }
+
+        .logo-section h1 {
+            font-size: 22px;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div class="registro-card">
+        <div class="logo-section">
+            <div class="logo-icon">✓</div>
+            <h1>Crear Cuenta</h1>
+            <p>Únete a Tres En Uno</p>
+        </div>
+
+        <form id="registroForm">
+            <div class="form-group">
+                <label for="nombre">Nombre Completo</label>
+                <div class="input-wrapper">
+                    <input type="text" id="nombre" placeholder="Juan Pérez" required minlength="3" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="correo">Correo Electrónico</label>
+                <div class="input-wrapper">
+                    <input type="email" id="correo" placeholder="tucorreo@ejemplo.com" required />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="tel" 
+                        id="telefono" 
+                        placeholder="912345678" 
+                        required
+                        maxlength="11"
+                        inputmode="numeric"
+                    />
+                </div>
+                <small class="validacion-mensaje info" id="telefono-hint">
+                    📱 Móvil: 912345678 | ☎️ Fijo: 22345678
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password" 
+                        placeholder="Mínimo 8 caracteres" 
+                        required 
+                        minlength="8"
+                    />
+                </div>
+                <!-- ⭐ NUEVO: Indicador de fortaleza -->
+                <div class="password-strength" id="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-bar-fill" id="strength-bar-fill"></div>
+                    </div>
+                    <small class="strength-text" id="strength-text"></small>
+                </div>
+                <small class="validacion-mensaje info">
+                    Debe tener al menos 8 caracteres, incluir letras y números
+                </small>
+            </div>
+            
+            <!-- ⭐ NUEVO: Campo Confirmar Contraseña -->
+            <div class="form-group">
+                <label for="password2">Confirmar Contraseña</label>
+                <div class="input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password2" 
+                        placeholder="Repite tu contraseña" 
+                        required 
+                        minlength="8"
+                    />
+                </div>
+                <small class="validacion-mensaje" id="password-match-text"></small>
+            </div>
+
+            <button type="submit" class="btn-registro" id="btn-registro">Registrarme</button>
+        </form>
+
+        <div class="links-section">
+            <p>¿Ya tienes una cuenta? <a href="{% url 'login-form' %}">Inicia Sesión</a></p>
+        </div>
+
+        <div id="mensaje"></div>
+    </div>
+
+    <script>
+        // ========== VALIDACIONES EN TIEMPO REAL ==========
+        
+        const passwordInput = document.getElementById('password');
+        const password2Input = document.getElementById('password2');
+        const telefonoInput = document.getElementById('telefono');
+        const matchText = document.getElementById('password-match-text');
+        const strengthDiv = document.getElementById('password-strength');
+        const strengthBarFill = document.getElementById('strength-bar-fill');
+        const strengthText = document.getElementById('strength-text');
+
+        // Validar teléfono (solo números)
+        telefonoInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 11) {
+                value = value.slice(0, 11);
+            }
+            e.target.value = value;
+        });
+
+        telefonoInput.addEventListener('keypress', function(e) {
+            const char = String.fromCharCode(e.which);
+            if (!/[0-9]/.test(char)) {
+                e.preventDefault();
+            }
+        });
+
+        // Indicador de fortaleza de contraseña
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            
+            if (password.length === 0) {
+                strengthDiv.classList.remove('show');
+                return;
+            }
+            
+            strengthDiv.classList.add('show');
+            
+            let strength = 0;
+            let strengthClass = '';
+            let strengthLabel = '';
+            
+            // Calcular fortaleza
+            if (password.length >= 8) strength += 25;
+            if (password.length >= 12) strength += 25;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 25;
+            if (/[0-9]/.test(password)) strength += 15;
+            if (/[^a-zA-Z0-9]/.test(password)) strength += 10;
+            
+            // Determinar nivel
+            if (strength < 40) {
+                strengthClass = 'debil';
+                strengthLabel = '🔴 Débil';
+            } else if (strength < 70) {
+                strengthClass = 'media';
+                strengthLabel = '🟡 Media';
+            } else {
+                strengthClass = 'fuerte';
+                strengthLabel = '🟢 Fuerte';
+            }
+            
+            strengthBarFill.className = 'strength-bar-fill ' + strengthClass;
+            strengthText.textContent = strengthLabel;
+            strengthText.className = 'strength-text ' + strengthClass;
+        });
+
+        // Validar que las contraseñas coincidan
+        password2Input.addEventListener('input', function() {
+            const password = passwordInput.value;
+            const password2 = this.value;
+            
+            if (password2.length === 0) {
+                matchText.style.display = 'none';
+                this.classList.remove('valido', 'invalido');
+                return;
+            }
+            
+            matchText.style.display = 'block';
+            
+            if (password === password2) {
+                matchText.textContent = '✓ Las contraseñas coinciden';
+                matchText.className = 'validacion-mensaje exito';
+                this.classList.add('valido');
+                this.classList.remove('invalido');
+            } else {
+                matchText.textContent = '✗ Las contraseñas no coinciden';
+                matchText.className = 'validacion-mensaje error';
+                this.classList.add('invalido');
+                this.classList.remove('valido');
+            }
+        });
+
+        // Validar también cuando se cambia la primera contraseña
+        passwordInput.addEventListener('input', function() {
+            if (password2Input.value.length > 0) {
+                password2Input.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // ========== ENVÍO DEL FORMULARIO ==========
+
+        document.getElementById('registroForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const nombre = document.getElementById('nombre').value; 
+            const telefono = document.getElementById('telefono').value; 
+            const correo = document.getElementById('correo').value;
+            const password = document.getElementById('password').value;
+            const password2 = document.getElementById('password2').value;  // ⭐ NUEVO
+            
+            const mensajeDiv = document.getElementById('mensaje');
+            const btnRegistro = document.getElementById('btn-registro');
+            
+            // Validar que las contraseñas coincidan antes de enviar
+            if (password !== password2) {
+                mensajeDiv.textContent = 'Las contraseñas no coinciden';
+                mensajeDiv.className = 'error';
+                mensajeDiv.style.display = 'block';
+                return;
+            }
+            
+            mensajeDiv.textContent = 'Creando cuenta...';
+            mensajeDiv.className = '';
+            mensajeDiv.style.display = 'block';
+            btnRegistro.disabled = true;
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        nombre, 
+                        correo, 
+                        telefono,
+                        password,
+                        password2  // ⭐ NUEVO: Enviar password2
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    mensajeDiv.textContent = '✅ ¡Registro exitoso! Redirigiendo al inicio de sesión...';
+                    mensajeDiv.className = 'exito';
+                    document.getElementById('registroForm').reset();
+                    strengthDiv.classList.remove('show');
+                    
+                    setTimeout(() => {
+                        window.location.href = '{% url "login-form" %}';
+                    }, 2000); 
+
+                } else {
+                    // ⭐ MEJORADO: Extraer mensajes de error más detallados
+                    let errores = [];
+                    
+                    if (data.correo) {
+                        errores.push('📧 ' + data.correo[0]);
+                    }
+                    if (data.password) {
+                        errores.push('🔒 ' + data.password[0]);
+                    }
+                    if (data.password2) {
+                        errores.push('🔒 ' + data.password2[0]);
+                    }
+                    if (data.telefono) {
+                        errores.push('📱 ' + data.telefono[0]);
+                    }
+                    if (data.nombre) {
+                        errores.push('👤 ' + data.nombre[0]);
+                    }
+                    if (data.detail) {
+                        errores.push(data.detail);
+                    }
+                    
+                    const errorMessage = errores.length > 0 
+                        ? errores.join('\n') 
+                        : 'Error en el registro. Verifica los datos.';
+                    
+                    mensajeDiv.textContent = errorMessage;
+                    mensajeDiv.className = 'error';
+                    mensajeDiv.style.whiteSpace = 'pre-line';
+                }
+            } catch (error) {
+                mensajeDiv.textContent = '❌ Error de conexión con el servidor.';
+                mensajeDiv.className = 'error';
+                console.error('Error:', error);
+            } finally {
+                btnRegistro.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

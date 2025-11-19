@@ -1,0 +1,76 @@
+{% load static %}
+
+<div class="row">
+    {% for producto in productos %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="package-item bg-white mb-2">
+                <!-- Imagen con enlace al detalle -->
+                <a href="{% url 'detalle_producto' producto.id %}">
+                    {% if producto.imagen %}
+                        {# ✅ CORREGIDO: producto.imagen.url en lugar de producto.imagen.imagen.url #}
+                        <img class="img-fluid" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" style="cursor: pointer; transition: transform 0.3s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    {% else %}
+                        <img class="img-fluid" src="{% static 'img/placeholder.png' %}" alt="Sin imagen" style="cursor: pointer;">
+                    {% endif %}
+                </a>
+                
+                <div class="p-4">
+                    <div class="d-flex justify-content-between mb-3">
+                        <small class="m-0"><i class="fa fa-calendar-alt text-primary mr-2"></i>{{ producto.unidad_medida }}</small>
+                        <small class="m-0"><i class="fa fa-cubes text-primary mr-2"></i>{{ producto.stock_disponible }} en stock</small>
+                    </div>
+                    
+                    <!-- Nombre del producto con enlace al detalle -->
+                    <a class="h5 text-decoration-none" href="{% url 'detalle_producto' producto.id %}" style="color: #333; transition: color 0.3s;" onmouseover="this.style.color='#28a745'" onmouseout="this.style.color='#333'">
+                        {{ producto.nombre }}
+                    </a>
+                    
+                    <p>{{ producto.descripcion|truncatewords:15 }}</p>
+                    
+                    <div class="border-top mt-4 pt-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Precio -->
+                            {# ✅ CORREGIDO: ofertas en lugar de oferta_set #}
+                            {% with oferta_activa=producto.ofertas_activas|first %}
+                                {% if oferta_activa %}
+                                    <div>
+                                        <h5 class="m-0">
+                                            <span style="text-decoration: line-through; color: #999; font-size: 0.9rem;">${{ producto.precio_unitario|floatformat:"0" }}</span><br>
+                                            <span style="color: #FF5733; font-weight: bold;">${{ oferta_activa.precio_oferta|floatformat:"0" }}</span>
+                                        </h5>
+                                        <small class="text-danger"><i class="fa fa-tag"></i> ¡OFERTA!</small>
+                                    </div>
+                                {% else %}
+                                    <h5 class="m-0">${{ producto.precio_unitario|floatformat:"0" }}</h5>
+                                {% endif %}
+                            {% endwith %}
+                            
+                            <!-- Botones -->
+                            <div class="d-flex flex-column">
+                                <a href="{% url 'detalle_producto' producto.id %}" class="btn btn-sm btn-primary mb-2" style="white-space: nowrap;">
+                                    <i class="fa fa-eye"></i> Ver Detalle
+                                </a>
+                                
+                                {% if producto.stock_disponible > 0 %}
+                                    <button class="btn btn-sm btn-success agregar-carrito-btn" data-producto-id="{{ producto.id }}" data-producto-nombre="{{ producto.nombre }}" style="white-space: nowrap;">
+                                        <i class="fa fa-shopping-cart"></i> Agregar
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-sm btn-secondary" disabled style="white-space: nowrap;">
+                                        <i class="fa fa-times"></i> Agotado
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fa fa-shopping-basket fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">No hay productos disponibles</h4>
+            <p class="text-muted">Vuelve más tarde para ver nuestros productos frescos.</p>
+        </div>
+    {% endfor %}
+</div>

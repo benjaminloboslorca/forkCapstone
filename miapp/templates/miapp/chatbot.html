@@ -1,0 +1,28 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'chatbot/chatbot.css' %}">
+
+<div id="cb-root" class="cb-hidden">
+    <div class="cb-header">
+        <div class="cb-title">¿Necesitas ayuda?</div>
+        <button class="cb-minimize" type="button" aria-label="Minimizar">–</button>
+    </div>
+
+    <div class="cb-messages" id="cb-messages">
+        <div class="cb-msg cb-bot">
+            <div class="cb-bubble">
+                ¡Hola! 🌿 Estoy para responder preguntas.
+                Elige una opción o escribe tu consulta.
+            </div>
+        </div>
+        <div class="cb-quick" id="cb-quick"></div>
+    </div>
+
+    <div class="cb-input">
+        <input id="cb-input" type="text" placeholder="Escribe tu mensaje..." />
+        <button id="cb-send" class="cb-send" type="button">Enviar</button>
+    </div>
+</div>
+
+<button id="cb-toggle" class="cb-fab" type="button" aria-label="Abrir chat">💬</button>
+
+<script src="{% static 'chatbot/chatbot.js' %}"></script>

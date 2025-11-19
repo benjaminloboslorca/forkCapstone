@@ -1,0 +1,111 @@
+{% load static %}
+
+<div class="container-fluid bg-light pt-3 d-none d-lg-block">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 text-center text-lg-left mb-2 mb-lg-0">
+                <div class="d-inline-flex align-items-center">
+                    <p><i
+                            class="fa fa-envelope mr-2"></i>ventas.tresenuno@gmail.com</p>
+                    <p class="text-body px-3">|</p>
+                    <p><i class="fa fa-phone-alt mr-2"></i>+56 9 4286 5185</p>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center text-lg-right">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-primary px-3" href><i
+                            class="fab fa-linkedin-in"></i></a>
+                    <a class="text-primary px-3" href><i
+                            class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid position-relative nav-bar p-0">
+    <div class="container-lg position-relative p-0 px-lg-3" style="z-index: 9;">
+        <nav
+            class="navbar navbar-expand-lg bg-light navbar-light shadow-lg py-3 py-lg-0 pl-3 pl-lg-5">
+            <a href="{% url 'inicio' %}" class="navbar-brand">
+                <img src="{% static 'img/logo.jpg' %}" alt="Tres en Uno Logo"
+                    style="height: 80px;">
+            </a>
+            <button type="button" class="navbar-toggler" data-toggle="collapse"
+                data-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-between px-3"
+                id="navbarCollapse">
+                <div class="navbar-nav ml-auto py-0">
+                    <a href="{% url 'inicio' %}"
+                        class="nav-item nav-link">Inicio</a>
+                    <a href="{% url 'nosotros' %}"
+                        class="nav-item nav-link">Nosotros</a>
+                    <a href="{% url 'listar_productos' %}"
+                        class="nav-item nav-link">Productos</a>
+                    <a href="{% url 'contacto' %}"
+                        class="nav-item nav-link">Contacto</a>
+
+                    <div id="auth-guest" class="d-flex align-items-center"
+                        style="display: none;">
+                        <a href="{% url 'login-form' %}"
+                            class="nav-item nav-link">
+                            <i class="fa fa-user mr-1"></i> Ingresar
+                        </a>
+                    </div>
+                    {# Ícono del Carrito con contador #}
+                    <a href="{% url 'ver_carrito' %}"
+                        class="nav-item nav-link position-relative">
+                        <i class="fa fa-shopping-cart"></i> Carrito
+                        <span id="cart-count" class="badge badge-danger"
+                            style="position: absolute; top: 5px; right: 5px; display: none;">0</span>
+                    </a>
+                    <div id="auth-user" class="d-flex align-items-center"
+                        style="display: none; white-space: nowrap;">
+
+                        <a href="{% url 'perfil' %}" class="nav-item nav-link">
+                            <i class="fa fa-user mr-1"></i>
+                            <span id="userNameDisplay">Mi Cuenta</span>
+                        </a>
+
+                        <a href="#" id="logout-link"
+                            class="nav-item nav-link text-danger">
+                            <i class="fas fa-sign-out-alt mr-1"></i> Cerrar
+                            Sesión
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarContadorCarrito();
+    });
+    
+    function actualizarContadorCarrito() {
+        fetch('/api/cart/')
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                var cartCount = document.getElementById('cart-count');
+                if (cartCount) {
+                    var cantidad = data.cantidad_items || 0;
+                    if (cantidad > 0) {
+                        cartCount.textContent = cantidad;
+                        cartCount.style.display = 'inline-block';
+                    } else {
+                        cartCount.style.display = 'none';
+                    }
+                }
+            })
+            .catch(function(error) {
+                console.log('Error al obtener el carrito:', error);
+            });
+    }
+</script>

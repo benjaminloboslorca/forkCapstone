@@ -1,0 +1,267 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Pedido Confirmado - Tres En Uno</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <link href="{% static 'img/logo.jpg' %}" rel="icon">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    
+    <style>
+        .confirmacion-container {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            margin: 40px 0;
+        }
+        
+        .check-icon {
+            width: 100px;
+            height: 100px;
+            background: #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: scaleIn 0.5s ease;
+        }
+        
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+        
+        .check-icon i {
+            font-size: 50px;
+            color: white;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .info-box h5 {
+            color: #28a745;
+            margin-bottom: 15px;
+        }
+        
+        .datos-transferencia {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 5px;
+        }
+        
+        .datos-transferencia h5 {
+            color: #856404;
+            margin-bottom: 20px;
+        }
+        
+        .dato-bancario {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .dato-bancario:last-child {
+            border-bottom: none;
+        }
+        
+        .producto-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .producto-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+        
+        .producto-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'miapp/barrabase.html' %}
+
+    <div class="container-fluid page-header">
+        <div class="container">
+            <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+                <h3 class="display-4 text-white text-uppercase">Pedido Confirmado</h3>
+                <div class="d-inline-flex text-white">
+                    <p class="m-0 text-uppercase"><a class="text-white" href="{% url 'inicio' %}">Inicio</a></p>
+                    <i class="fa fa-angle-double-right pt-1 px-3"></i>
+                    <p class="m-0 text-uppercase">Confirmación</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        <div class="confirmacion-container">
+            <div class="check-icon">
+                <i class="fa fa-check"></i>
+            </div>
+            
+            <h2 class="text-success mb-3">¡Pedido Realizado con Éxito!</h2>
+            <p class="lead">Gracias por tu compra, <strong>{{ pedido.nombre_cliente }}</strong></p>
+            <p class="text-muted">Te hemos enviado un correo de confirmación a: <strong>{{ pedido.correo_cliente }}</strong></p>
+            
+            <div class="alert alert-info mt-4">
+                <i class="fa fa-info-circle mr-2"></i>
+                Tu número de pedido es: <strong>#{{ pedido.id }}</strong>
+            </div>
+
+            <!-- Datos para Transferencia -->
+            <div class="datos-transferencia">
+                <h5><i class="fa fa-university mr-2"></i>Datos para Transferencia Bancaria</h5>
+                <p class="text-muted mb-3">Realiza la transferencia con los siguientes datos:</p>
+                
+                <div class="dato-bancario">
+                    <span><strong>Banco:</strong></span>
+                    <span>Banco Estado</span>
+                </div>
+                <div class="dato-bancario">
+                    <span><strong>Tipo de Cuenta:</strong></span>
+                    <span>Cuenta Vista</span>
+                </div>
+                <div class="dato-bancario">
+                    <span><strong>Número de Cuenta:</strong></span>
+                    <span>90272246717</span>
+                </div>
+                <div class="dato-bancario">
+                    <span><strong>RUT:</strong></span>
+                    <span>77.851.212-2</span>
+                </div>
+                <div class="dato-bancario">
+                    <span><strong>Titular:</strong></span>
+                    <span>Tres en uno</span>
+                </div>
+                <div class="dato-bancario">
+                    <span><strong>Monto a Transferir:</strong></span>
+                    <span class="text-danger"><strong>${{ pedido.total_pedido|floatformat:0 }}</strong></span>
+                </div>
+                
+                <div class="alert alert-warning mt-3 mb-0">
+                    <i class="fa fa-exclamation-triangle mr-2"></i>
+                    <strong>Importante:</strong> Incluye el número de pedido <strong>#{{ pedido.id }}</strong> en el mensaje de la transferencia.
+                </div>
+            </div>
+
+            <!-- Detalles del Pedido -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="info-box">
+                        <h5><i class="fa fa-box mr-2"></i>Productos</h5>
+                        {% for item in detalles_con_subtotal %}
+                        <div class="producto-item">
+                            {% if item.detalle.producto.imagen %}
+                                <img src="{{ item.detalle.producto.imagen.url }}" alt="{{ item.detalle.producto.nombre }}">
+                            {% else %}
+                                <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <strong>{{ item.detalle.id_producto.nombre }}</strong>
+                                <br>
+                                <small class="text-muted">{{ item.detalle.cantidad }} x ${{ item.detalle.precio_compra|floatformat:0 }}</small>
+                            </div>
+                            <strong>${{ item.subtotal|floatformat:0 }}</strong>
+                        </div>
+                        {% endfor %}
+                        
+                        <div class="d-flex justify-content-between mt-3 pt-3 border-top">
+                            <strong>Total:</strong>
+                            <strong class="text-primary">${{ pedido.total_pedido|floatformat:0 }}</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="info-box">
+                        <h5><i class="fa fa-truck mr-2"></i>Dirección de Envío</h5>
+                        <p class="mb-1"><strong>{{ pedido.nombre_cliente }}</strong></p>
+                        <p class="mb-1">{{ pedido.direccion }}</p>
+                        <p class="mb-1">{{ pedido.comuna }}, {{ pedido.region }}</p>
+                        {% if pedido.codigo_postal %}
+                        <p class="mb-1">C.P: {{ pedido.codigo_postal }}</p>
+                        {% endif %}
+                        {% if pedido.referencia_direccion %}
+                        <p class="mb-1 text-muted"><small>Ref: {{ pedido.referencia_direccion }}</small></p>
+                        {% endif %}
+                        <p class="mb-0 mt-2">
+                            <i class="fa fa-phone mr-1"></i>{{ pedido.telefono_cliente }}
+                        </p>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h5><i class="fa fa-info-circle mr-2"></i>Estado del Pedido</h5>
+                        <span class="badge badge-warning p-2">{{ pedido.get_estado_pedido_display }}</span>
+                        <p class="text-muted mt-3 mb-0">
+                            <small>Una vez confirmado el pago, procesaremos tu pedido y te enviaremos actualizaciones por correo.</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="mt-5">
+                <a href="{% url 'inicio' %}" class="btn btn-primary btn-lg mr-2">
+                    <i class="fa fa-home mr-2"></i>Volver al Inicio
+                </a>
+                <a href="{% url 'listar_productos' %}" class="btn btn-outline-primary btn-lg">
+                    <i class="fa fa-shopping-bag mr-2"></i>Seguir Comprando
+                </a>
+            </div>
+
+            <div class="mt-4">
+                <p class="text-muted">
+                    <i class="fa fa-envelope mr-2"></i>
+                    ¿Tienes preguntas? Contáctanos a <a href="mailto:ventas.tresenuno@gmail.com">ventas.tresenuno@gmail.com</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {% include 'miapp/barrabaja.html' %}
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+
+    <script src="{% static 'mail/jqBootstrapValidation.min.js' %}"></script>
+    <script src="{% static 'mail/contact.js' %}"></script>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

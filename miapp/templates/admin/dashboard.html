@@ -1,0 +1,350 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Dashboard - {{ site_title }}{% endblock %}
+
+{% block extrastyle %}
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+    
+    .metric-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    .metric-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #417690;
+    }
+    
+    .metric-label {
+        color: #666;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .metric-icon {
+        font-size: 40px;
+        opacity: 0.3;
+        float: right;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .dashboard-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .badge-custom {
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .badge-warning { background: #ffc107; color: #000; }
+    .badge-success { background: #28a745; color: #fff; }
+    .badge-info { background: #17a2b8; color: #fff; }
+    .badge-primary { background: #007bff; color: #fff; }
+    .badge-secondary { background: #6c757d; color: #fff; }
+    .badge-danger { background: #dc3545; color: #fff; }
+    
+    .change-positive {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .change-negative {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    canvas {
+        max-height: 400px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1>📊 Dashboard de Ventas - Tres En Uno</h1>
+    <p style="color: #666; margin-bottom: 30px;">Panel de control y métricas principales</p>
+    
+    <!-- Métricas Principales -->
+    <div class="dashboard-row">
+        <div class="metric-card">
+            <div class="metric-icon">💰</div>
+            <div class="metric-value">${{ ventas_mes|floatformat:0 }}</div>
+            <div class="metric-label">Ventas del Mes</div>
+            {% if cambio_porcentaje >= 0 %}
+                <small class="change-positive">↑ {{ cambio_porcentaje }}% vs semana anterior</small>
+            {% else %}
+                <small class="change-negative">↓ {{ cambio_porcentaje }}% vs semana anterior</small>
+            {% endif %}
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-icon">📦</div>
+            <div class="metric-value">{{ pedidos_mes }}</div>
+            <div class="metric-label">Pedidos del Mes</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-icon">⏳</div>
+            <div class="metric-value">{{ pedidos_pendientes }}</div>
+            <div class="metric-label">Pedidos Pendientes</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-icon">🛍️</div>
+            <div class="metric-value">{{ total_productos }}</div>
+            <div class="metric-label">Productos Activos</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-icon">👥</div>
+            <div class="metric-value">{{ total_clientes }}</div>
+            <div class="metric-label">Clientes Registrados</div>
+        </div>
+    </div>
+    
+    <!-- Gráfico de Ventas -->
+    <div class="chart-container">
+        <h2 style="margin-bottom: 20px;">📈 Ventas de los Últimos 30 Días</h2>
+        <canvas id="ventasChart"></canvas>
+    </div>
+    
+    <!-- Gráficos en dos columnas -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+        <div class="chart-container">
+            <h3 style="margin-bottom: 20px;">📊 Pedidos por Estado</h3>
+            <canvas id="estadosChart"></canvas>
+        </div>
+        
+        <div class="chart-container">
+            <h3 style="margin-bottom: 20px;">🏷️ Ventas por Categoría</h3>
+            <canvas id="categoriasChart"></canvas>
+        </div>
+    </div>
+    
+    <!-- Tablas -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- Top Productos -->
+        <div class="table-container">
+            <h3 style="margin-bottom: 15px;">🏆 Top 5 Productos Más Vendidos</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #ddd;">
+                        <th style="text-align: left; padding: 10px;">Producto</th>
+                        <th style="text-align: right; padding: 10px;">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos_vendidos %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px;">{{ producto.producto__nombre }}</td>
+                        <td style="text-align: right; padding: 10px; font-weight: bold;">{{ producto.total_vendido }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 20px; color: #999;">
+                            No hay datos disponibles
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Últimos Pedidos -->
+        <div class="table-container">
+            <h3 style="margin-bottom: 15px;">📋 Últimos 10 Pedidos</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #ddd;">
+                        <th style="text-align: left; padding: 10px;">Pedido</th>
+                        <th style="text-align: left; padding: 10px;">Cliente</th>
+                        <th style="text-align: center; padding: 10px;">Estado</th>
+                        <th style="text-align: right; padding: 10px;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pedido in ultimos_pedidos %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px;">
+                            <a href="{% url 'admin:miapp_pedido_change' pedido.id %}">#{{ pedido.id }}</a>
+                        </td>
+                        <td style="padding: 10px;">{{ pedido.nombre_cliente|truncatewords:3 }}</td>
+                        <td style="text-align: center; padding: 10px;">
+                            {% if pedido.estado_pedido == 'pendiente_pago' %}
+                                <span class="badge-custom badge-warning">{{ pedido.get_estado_pedido_display }}</span>
+                            {% elif pedido.estado_pedido == 'pagado' %}
+                                <span class="badge-custom badge-success">{{ pedido.get_estado_pedido_display }}</span>
+                            {% elif pedido.estado_pedido == 'preparando' %}
+                                <span class="badge-custom badge-info">{{ pedido.get_estado_pedido_display }}</span>
+                            {% elif pedido.estado_pedido == 'enviado' %}
+                                <span class="badge-custom badge-primary">{{ pedido.get_estado_pedido_display }}</span>
+                            {% elif pedido.estado_pedido == 'completado' %}
+                                <span class="badge-custom badge-secondary">{{ pedido.get_estado_pedido_display }}</span>
+                            {% else %}
+                                <span class="badge-custom badge-danger">{{ pedido.get_estado_pedido_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="text-align: right; padding: 10px; font-weight: bold;">
+                            ${{ pedido.total_pedido|floatformat:0 }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align: center; padding: 20px; color: #999;">
+                            No hay pedidos recientes
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+<script>
+// Parsear datos desde el backend
+const ventasLabels = JSON.parse('{{ ventas_labels|escapejs }}');
+const ventasData = JSON.parse('{{ ventas_data|escapejs }}');
+const estadosLabels = JSON.parse('{{ estados_labels|escapejs }}');
+const estadosData = JSON.parse('{{ estados_data|escapejs }}');
+const estadosBackground = JSON.parse('{{ estados_background|escapejs }}');
+const categoriasLabels = JSON.parse('{{ categorias_labels|escapejs }}');
+const categoriasData = JSON.parse('{{ categorias_data|escapejs }}');
+
+// Gráfico de Ventas (Línea)
+const ventasCtx = document.getElementById('ventasChart');
+if (ventasCtx) {
+    new Chart(ventasCtx, {
+        type: 'line',
+        data: {
+            labels: ventasLabels,
+            datasets: [{
+                label: 'Ventas ($)',
+                data: ventasData,
+                borderColor: '#417690',
+                backgroundColor: 'rgba(65, 118, 144, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString('es-CL');
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Gráfico de Estados (Dona)
+const estadosCtx = document.getElementById('estadosChart');
+if (estadosCtx && estadosData.length > 0) {
+    new Chart(estadosCtx, {
+        type: 'doughnut',
+        data: {
+            labels: estadosLabels,
+            datasets: [{
+                data: estadosData,
+                backgroundColor: estadosBackground,
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Gráfico de Categorías (Barra)
+const categoriasCtx = document.getElementById('categoriasChart');
+if (categoriasCtx && categoriasData.length > 0) {
+    new Chart(categoriasCtx, {
+        type: 'bar',
+        data: {
+            labels: categoriasLabels,
+            datasets: [{
+                label: 'Unidades Vendidas',
+                data: categoriasData,
+                backgroundColor: '#28a745',
+                borderColor: '#1e7e34',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,607 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Mi Perfil - Tres En Uno</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="{% static 'img/logo.jpg' %}" rel="icon">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    
+    <style>
+        .perfil-header-info {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .perfil-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .perfil-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #81C408;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        
+        .perfil-datos {
+            flex: 1;
+        }
+        
+        .form-editar {
+            display: none;
+        }
+        
+        .form-editar.activo {
+            display: block;
+        }
+        
+        .vista-normal {
+            display: block;
+        }
+        
+        .vista-normal.oculto {
+            display: none;
+        }
+        
+        .btn-editar {
+            background: #81C408;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-editar:hover {
+            background: #6ba007;
+        }
+        
+        .btn-cancelar {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .btn-cancelar:hover {
+            background: #5a6268;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #81C408;
+        }
+        
+        .alert {
+            padding: 12px 20px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .pedidos-section {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .pedido-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        .pedido-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .badge-estado {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .badge-pendiente { background: #ffc107; color: #000; }
+        .badge-pagado { background: #28a745; color: #fff; }
+        .badge-preparando { background: #17a2b8; color: #fff; }
+        .badge-enviado { background: #007bff; color: #fff; }
+        .badge-completado { background: #6c757d; color: #fff; }
+        .badge-cancelado { background: #dc3545; color: #fff; }
+        
+        .pedido-productos {
+            margin-top: 15px;
+        }
+        
+        .producto-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .producto-item:last-child {
+            border-bottom: none;
+        }
+        
+        .producto-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+        
+        .producto-info {
+            flex: 1;
+        }
+        
+        .pedido-total {
+            text-align: right;
+            font-size: 20px;
+            font-weight: bold;
+            color: #81C408;
+            margin-top: 15px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .empty-state i {
+            font-size: 64px;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'miapp/barrabase.html' %}
+    
+    <!-- BANNER HEADER -->
+    <div class="container-fluid page-header">
+        <div class="container">
+            <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 400px">
+                <h3 class="display-4 text-white text-uppercase">Mi Perfil</h3>
+                <div class="d-inline-flex text-white">
+                    <p class="m-0 text-uppercase"><a class="text-white" href="{% url 'inicio' %}">Inicio</a></p>
+                    <i class="fa fa-angle-double-right pt-1 px-3"></i>
+                    <p class="m-0 text-uppercase">Perfil</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CONTENIDO DEL PERFIL -->
+    <div class="container-fluid py-5">
+        <div class="container pt-5 pb-3">
+            <!-- Header del Perfil -->
+            <div class="perfil-header-info">
+                <!-- Alertas -->
+                <div id="alert-container"></div>
+                
+                <div class="perfil-info">
+                    <div class="perfil-avatar">
+                        <span id="avatar-inicial">{{ usuario.nombre|slice:":1"|upper }}</span>
+                    </div>
+                    <div class="perfil-datos">
+                        <!-- Vista Normal -->
+                        <div id="vista-normal" class="vista-normal">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div>
+                                    <h2 style="margin: 0;" id="nombre-display">{{ usuario.nombre }}</h2>
+                                    <p style="margin: 5px 0; color: #666;">
+                                        <i class="fa fa-envelope mr-2"></i>
+                                        <span id="correo-display">{{ usuario.correo }}</span>
+                                    </p>
+                                    <p style="margin: 5px 0; color: #666;">
+                                        <i class="fa fa-phone mr-2"></i>
+                                        <span id="telefono-display">{{ usuario.telefono|default:"Sin teléfono" }}</span>
+                                    </p>
+                                </div>
+                                <button class="btn-editar" onclick="activarEdicion()">
+                                    <i class="fa fa-edit mr-1"></i> Editar Perfil
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Formulario de Edición -->
+                        <div id="form-editar" class="form-editar">
+                            <form id="formActualizarPerfil">
+                                <div class="form-group">
+                                    <label for="nombre">Nombre Completo</label>
+                                    <input type="text" id="nombre" name="nombre" value="{{ usuario.nombre }}" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="correo">Correo Electrónico</label>
+                                    <input type="email" id="correo" name="correo" value="{{ usuario.correo }}" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="telefono">Teléfono</label>
+                                    <input 
+                                        type="tel" 
+                                        id="telefono" 
+                                        name="telefono" 
+                                        value="{{ usuario.telefono|default:'' }}" 
+                                        placeholder="9 1234 5678"
+                                        pattern="[0-9]{8,11}"
+                                        maxlength="11"
+                                        inputmode="numeric"
+                                        title="Ingrese solo números (8-11 dígitos)"
+                                    >
+                                    <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                                        📱 Móvil: 912345678 | ☎️ Fijo: 22345678
+                                    </small>
+                                </div>
+                                
+                                <div style="margin-top: 20px;">
+                                    <button type="submit" class="btn-editar">
+                                        <i class="fa fa-save mr-1"></i> Guardar Cambios
+                                    </button>
+                                    <button type="button" class="btn-cancelar" onclick="cancelarEdicion()">
+                                        <i class="fa fa-times mr-1"></i> Cancelar
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Historial de Pedidos -->
+            <div class="pedidos-section">
+                <h3 style="margin-bottom: 30px;">
+                    <i class="fa fa-shopping-bag mr-2"></i>
+                    Historial de Pedidos
+                    <span style="color: #999; font-size: 16px; font-weight: normal;">
+                        ({{ pedidos.count }} pedido{{ pedidos.count|pluralize }})
+                    </span>
+                </h3>
+                
+                {% if pedidos %}
+                    {% for pedido in pedidos %}
+                    <div class="pedido-card">
+                        <!-- Header del Pedido -->
+                        <div class="pedido-header">
+                            <div>
+                                <h4 style="margin: 0;">
+                                    Pedido #{{ pedido.id }}
+                                </h4>
+                                <small style="color: #666;">
+                                    <i class="fa fa-calendar mr-1"></i>
+                                    {{ pedido.fecha_pedido|date:"d/m/Y H:i" }}
+                                </small>
+                            </div>
+                            <div>
+                                {% if pedido.estado_pedido == 'pendiente_pago' %}
+                                    <span class="badge-estado badge-pendiente">Pendiente de Pago</span>
+                                {% elif pedido.estado_pedido == 'pagado' %}
+                                    <span class="badge-estado badge-pagado">Pagado</span>
+                                {% elif pedido.estado_pedido == 'preparando' %}
+                                    <span class="badge-estado badge-preparando">Preparando</span>
+                                {% elif pedido.estado_pedido == 'enviado' %}
+                                    <span class="badge-estado badge-enviado">Enviado</span>
+                                {% elif pedido.estado_pedido == 'completado' %}
+                                    <span class="badge-estado badge-completado">Completado</span>
+                                {% else %}
+                                    <span class="badge-estado badge-cancelado">Cancelado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Dirección de Envío -->
+                        <div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px;">
+                            <small style="color: #666;">
+                                <i class="fa fa-map-marker-alt mr-2"></i>
+                                <strong>Envío a:</strong> {{ pedido.direccion }}, {{ pedido.comuna }}, {{ pedido.region }}
+                            </small>
+                        </div>
+                        
+                        <!-- Productos del Pedido -->
+                        <div class="pedido-productos">
+                            <strong style="color: #333; display: block; margin-bottom: 10px;">
+                                Productos:
+                            </strong>
+                            {% for detalle in pedido.detalles.all %}
+                            <div class="producto-item">
+                                {% if detalle.producto.imagen %}
+                                <img src="{{ detalle.producto.imagen.url }}" 
+                                     alt="{{ detalle.producto.nombre }}" 
+                                     class="producto-img">
+                                {% else %}
+                                <div class="producto-img" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa fa-image" style="color: #ccc;"></i>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="producto-info">
+                                    <strong>{{ detalle.producto.nombre }}</strong>
+                                    <br>
+                                    <small style="color: #666;">
+                                        Cantidad: {{ detalle.cantidad }} x ${{ detalle.precio_compra|floatformat:0 }}
+                                    </small>
+                                </div>
+                                
+                                <div style="text-align: right;">
+                                    <strong style="color: #81C408;">
+                                        ${{ detalle.subtotal|floatformat:0 }}
+                                    </strong>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Total del Pedido -->
+                        <div class="pedido-total">
+                            Total: ${{ pedido.total_pedido|floatformat:0 }}
+                        </div>
+                        
+                        <!-- Método de Pago -->
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                            <small style="color: #666;">
+                                <i class="fa fa-credit-card mr-2"></i>
+                                <strong>Método de pago:</strong> 
+                                {% if pedido.metodo_pago == 'transferencia' %}
+                                    Transferencia Bancaria
+                                {% elif pedido.metodo_pago == 'webpay' %}
+                                    Webpay
+                                {% else %}
+                                    {{ pedido.get_metodo_pago_display }}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <!-- Estado vacío -->
+                    <div class="empty-state">
+                        <i class="fa fa-shopping-bag"></i>
+                        <h4>No tienes pedidos aún</h4>
+                        <p style="color: #666; margin-bottom: 20px;">
+                            Comienza a explorar nuestros productos y realiza tu primer pedido
+                        </p>
+                        <a href="{% url 'listar_productos' %}" class="btn btn-primary">
+                            <i class="fa fa-shopping-cart mr-2"></i>
+                            Ir a Productos
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    {% include 'miapp/barrabaja.html' %}
+    
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static 'mail/jqBootstrapValidation.min.js' %}"></script>
+    <script src="{% static 'mail/contact.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    
+    <script>
+        // Formateo automático del teléfono
+        document.addEventListener('DOMContentLoaded', function() {
+            const telefonoInput = document.getElementById('telefono');
+            
+            if (telefonoInput) {
+                // Limpiar formato al cargar (quitar +56 si existe)
+                let valorInicial = telefonoInput.value;
+                if (valorInicial.startsWith('+56')) {
+                    telefonoInput.value = valorInicial.substring(3);
+                }
+                
+                telefonoInput.addEventListener('input', function(e) {
+                    // Eliminar todo lo que no sea número
+                    let value = e.target.value.replace(/\D/g, '');
+                    
+                    // Limitar a 11 dígitos
+                    if (value.length > 11) {
+                        value = value.slice(0, 11);
+                    }
+                    
+                    // Eliminar el prefijo 56 si lo escribieron
+                    if (value.startsWith('56') && value.length > 9) {
+                        value = value.slice(2);
+                    }
+                    
+                    e.target.value = value;
+                });
+                
+                // Prevenir caracteres no numéricos
+                telefonoInput.addEventListener('keypress', function(e) {
+                    const char = String.fromCharCode(e.which);
+                    if (!/[0-9]/.test(char)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+        
+        // Funciones para editar perfil
+        function activarEdicion() {
+            document.getElementById('vista-normal').classList.add('oculto');
+            document.getElementById('form-editar').classList.add('activo');
+        }
+        
+        function cancelarEdicion() {
+            document.getElementById('vista-normal').classList.remove('oculto');
+            document.getElementById('form-editar').classList.remove('activo');
+        }
+        
+        function mostrarAlerta(mensaje, tipo) {
+            const container = document.getElementById('alert-container');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${tipo} show`;
+            alert.innerHTML = `
+                <i class="fa fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'} mr-2"></i>
+                ${mensaje}
+            `;
+            container.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.classList.remove('show');
+                setTimeout(() => alert.remove(), 300);
+            }, 5000);
+        }
+        
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        // Manejar envío del formulario
+        document.getElementById('formActualizarPerfil').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('nombre').value;
+            const correo = document.getElementById('correo').value;
+            const telefono = document.getElementById('telefono').value;
+            
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin mr-1"></i> Guardando...';
+            
+            fetch('/api/perfil/actualizar/', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    nombre: nombre,
+                    correo: correo,
+                    telefono: telefono
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message) {
+                    // Actualizar vista
+                    document.getElementById('nombre-display').textContent = data.cliente.nombre;
+                    document.getElementById('correo-display').textContent = data.cliente.correo;
+                    document.getElementById('telefono-display').textContent = data.cliente.telefono || 'Sin teléfono';
+                    document.getElementById('avatar-inicial').textContent = data.cliente.nombre.charAt(0).toUpperCase();
+                    
+                    // Cerrar formulario
+                    cancelarEdicion();
+                    
+                    // Mostrar mensaje de éxito
+                    mostrarAlerta('✅ ' + data.message, 'success');
+                } else if (data.error) {
+                    mostrarAlerta('❌ ' + data.error, 'error');
+                } else {
+                    // Mostrar errores de validación
+                    let errores = [];
+                    for (let campo in data) {
+                        if (Array.isArray(data[campo])) {
+                            errores.push(...data[campo]);
+                        }
+                    }
+                    mostrarAlerta('❌ ' + errores.join(', '), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAlerta('❌ Error al actualizar el perfil', 'error');
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+    </script>
+</body>
+
+</html>

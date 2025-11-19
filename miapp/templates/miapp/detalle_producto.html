@@ -1,0 +1,643 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>{{ producto.nombre }} - Tres En Uno</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <link href="{% static 'img/logo.jpg' %}" rel="icon">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    
+    <style>
+        .product-image-carousel {
+            position: relative;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .product-image-main {
+            width: 100%;
+            height: 500px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .badge-oferta {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff6b6b;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 16px;
+            z-index: 10;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+        }
+        
+        .product-info {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .precio-original {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 1.2rem;
+        }
+        
+        .precio-oferta {
+            color: #ff6b6b;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .precio-normal {
+            color: #28a745;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .stock-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .stock-disponible {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .stock-bajo {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .stock-agotado {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .btn-agregar-carrito {
+            background: #28a745;
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        
+        .btn-agregar-carrito:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-agregar-carrito:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .cantidad-selector {
+            display: inline-flex;
+            align-items: center;
+            border: 2px solid #ddd;
+            border-radius: 50px;
+            overflow: hidden;
+        }
+        
+        .cantidad-selector button {
+            background: #f8f9fa;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .cantidad-selector button:hover {
+            background: #e9ecef;
+        }
+        
+        .cantidad-selector input {
+            border: none;
+            text-align: center;
+            width: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .product-tabs {
+            margin-top: 50px;
+        }
+        
+        .product-tabs .nav-tabs {
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .product-tabs .nav-tabs .nav-link {
+            color: #666;
+            border: none;
+            padding: 15px 30px;
+            font-weight: 500;
+        }
+        
+        .product-tabs .nav-tabs .nav-link.active {
+            color: #28a745;
+            border-bottom: 3px solid #28a745;
+        }
+        
+        /* ESTILOS PARA PRODUCTOS RELACIONADOS */
+        .related-product-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .related-product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .related-product-img-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+        }
+        
+        .related-product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .related-product-card:hover .related-product-img {
+            transform: scale(1.1);
+        }
+        
+        .badge-oferta-small {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff6b6b;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+        }
+        
+        .related-product-body {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .related-product-category {
+            color: #6c757d;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .related-product-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            min-height: 50px;
+            line-height: 1.4;
+        }
+        
+        .related-product-name a {
+            color: inherit;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .related-product-name a:hover {
+            color: #28a745;
+        }
+        
+        .related-product-price-section {
+            margin-bottom: 15px;
+        }
+        
+        .related-product-price {
+            font-size: 1.8rem;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .related-product-price.oferta {
+            color: #ff6b6b;
+        }
+        
+        .related-product-price-original {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 1rem;
+            margin-left: 10px;
+        }
+        
+        .related-product-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            display: block;
+            transition: all 0.3s;
+            font-weight: 600;
+            margin-top: auto;
+        }
+        
+        .related-product-btn:hover {
+            background: #218838;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'miapp/barrabase.html' %}
+
+    <div class="container-fluid page-header">
+        <div class="container">
+            <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
+                <h3 class="display-4 text-white text-uppercase">{{ producto.nombre }}</h3>
+                <div class="d-inline-flex text-white">
+                    <p class="m-0 text-uppercase"><a class="text-white" href="{% url 'inicio' %}">Inicio</a></p>
+                    <i class="fa fa-angle-double-right pt-1 px-3"></i>
+                    <p class="m-0 text-uppercase"><a class="text-white" href="{% url 'listar_productos' %}">Productos</a></p>
+                    <i class="fa fa-angle-double-right pt-1 px-3"></i>
+                    <p class="m-0 text-uppercase">{{ producto.nombre }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="product-image-carousel position-relative">
+                        {% if ofertas %}
+                            <div class="badge-oferta">
+                                <i class="fa fa-tag"></i> ¡OFERTA!
+                            </div>
+                        {% endif %}
+                        
+                        {% if producto.imagen %}
+                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image-main">
+                        {% else %}
+                            <img src="{% static 'img/default-product.jpg' %}" alt="Sin imagen" class="product-image-main">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="product-info">
+                        <h1 class="mb-3">{{ producto.nombre }}</h1>
+                        
+                        <p class="text-muted mb-3">
+                            <i class="fa fa-tag"></i> 
+                            <strong>Categoría:</strong> {{ producto.id_categoria.nombre_categoria }}
+                        </p>
+                        
+                        <div class="mb-4">
+                            {% if ofertas %}
+                                {% for oferta in ofertas %}
+                                    {% if forloop.first %}
+                                        <span class="precio-original">${{ producto.precio_unitario }}</span>
+                                        <span class="precio-oferta">${{ oferta.precio_oferta }}</span>
+                                        <p class="text-muted mb-0">
+                                            <small>Oferta válida hasta: {{ oferta.fecha_fin|date:"d/m/Y H:i" }}</small>
+                                        </p>
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <span class="precio-normal">${{ producto.precio_unitario }}</span>
+                            {% endif %}
+                            <span class="text-muted"> / {{ producto.unidad_medida }}</span>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <strong>Disponibilidad:</strong>
+                            {% if producto.stock_disponible > 10 %}
+                                <span class="stock-badge stock-disponible">
+                                    <i class="fa fa-check-circle"></i> En Stock ({{ producto.stock_disponible }} unidades)
+                                </span>
+                            {% elif producto.stock_disponible > 0 %}
+                                <span class="stock-badge stock-bajo">
+                                    <i class="fa fa-exclamation-triangle"></i> Últimas unidades ({{ producto.stock_disponible }} disponibles)
+                                </span>
+                            {% else %}
+                                <span class="stock-badge stock-agotado">
+                                    <i class="fa fa-times-circle"></i> Agotado
+                                </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5>Descripción</h5>
+                            <p>{{ producto.descripcion }}</p>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="d-block mb-2"><strong>Cantidad:</strong></label>
+                            <div class="cantidad-selector">
+                                <button type="button" id="btn-decrementar" {% if producto.stock_disponible == 0 %}disabled{% endif %}>
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                                <input type="number" id="cantidad" value="1" min="1" max="{{ producto.stock_disponible }}" readonly>
+                                <button type="button" id="btn-incrementar" {% if producto.stock_disponible == 0 %}disabled{% endif %}>
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <button class="btn btn-agregar-carrito" id="btn-agregar-carrito" 
+                                    {% if producto.stock_disponible == 0 %}disabled{% endif %}>
+                                <i class="fa fa-shopping-cart"></i> Agregar al Carrito
+                            </button>
+                        </div>
+                        
+                        <div class="border-top pt-3 mt-4">
+                            <p class="mb-2"><i class="fa fa-truck text-primary"></i> Envío a todo Chile</p>
+                            <p class="mb-2"><i class="fa fa-shield-alt text-primary"></i> Producto 100% orgánico</p>
+                            <p class="mb-0"><i class="fa fa-leaf text-primary"></i> Cultivo sustentable</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-tabs">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#descripcion-tab">Descripción Detallada</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#beneficios-tab">Beneficios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#conservacion-tab">Conservación</a>
+                    </li>
+                </ul>
+                <div class="tab-content bg-white p-4">
+                    <div id="descripcion-tab" class="tab-pane fade show active">
+                        <h4>Descripción Detallada</h4>
+                        <p>{{ producto.descripcion }}</p>
+                        <p>Nuestros productos son cultivados mediante técnicas de acuaponía, un sistema sustentable que combina la cría de peces con el cultivo de plantas, reduciendo el uso de agua hasta en un 90% comparado con la agricultura tradicional.</p>
+                    </div>
+                    <div id="beneficios-tab" class="tab-pane fade">
+                        <h4>Beneficios</h4>
+                        <ul>
+                            <li>✓ 100% orgánico, sin pesticidas ni químicos</li>
+                            <li>✓ Cultivado en ambiente controlado</li>
+                            <li>✓ Mayor contenido nutricional</li>
+                            <li>✓ Frescura garantizada</li>
+                            <li>✓ Producción sustentable y ecológica</li>
+                        </ul>
+                    </div>
+                    <div id="conservacion-tab" class="tab-pane fade">
+                        <h4>Conservación y Uso</h4>
+                        <p><strong>Almacenamiento:</strong> Conservar en refrigeración entre 2°C y 4°C.</p>
+                        <p><strong>Duración:</strong> Hasta 7 días en condiciones óptimas.</p>
+                        <p><strong>Preparación:</strong> Lavar con agua antes de consumir.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============= PRODUCTOS RELACIONADOS ============= -->
+            {% if productos_relacionados %}
+            <div class="mt-5 mb-5">
+                <h3 class="text-center mb-2" style="font-weight: 700; color: #333;">Más Productos</h3>
+                <p class="text-center text-muted mb-5">Otros productos de {{ producto.id_categoria.nombre_categoria }}</p>
+                
+                <div class="row">
+                    {% for prod_rel in productos_relacionados %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="related-product-card">
+                            <div class="related-product-img-container">
+                                {% if prod_rel.ofertas_activas %}
+                                    <span class="badge-oferta-small">
+                                        <i class="fa fa-tag"></i> OFERTA
+                                    </span>
+                                {% endif %}
+                                
+                                <a href="{% url 'detalle_producto' prod_rel.id %}">
+                                    {% if prod_rel.imagen %}
+                                        <img src="{{ prod_rel.imagen.url }}" alt="{{ prod_rel.nombre }}" class="related-product-img">
+                                    {% else %}
+                                        <img src="{% static 'img/default-product.jpg' %}" alt="Sin imagen" class="related-product-img">
+                                    {% endif %}
+                                </a>
+                            </div>
+                            
+                            <div class="related-product-body">
+                                <div class="related-product-category">
+                                    <i class="fa fa-tag"></i> {{ prod_rel.id_categoria.nombre_categoria }}
+                                </div>
+                                
+                                <h5 class="related-product-name">
+                                    <a href="{% url 'detalle_producto' prod_rel.id %}">
+                                        {{ prod_rel.nombre }}
+                                    </a>
+                                </h5>
+                                
+                                <div class="related-product-price-section">
+                                    {% if prod_rel.ofertas_activas %}
+                                        <span class="related-product-price oferta">
+                                            ${{ prod_rel.ofertas_activas.0.precio_oferta }}
+                                        </span>
+                                        <span class="related-product-price-original">
+                                            ${{ prod_rel.precio_unitario }}
+                                        </span>
+                                    {% else %}
+                                        <span class="related-product-price">
+                                            ${{ prod_rel.precio_unitario }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <a href="{% url 'detalle_producto' prod_rel.id %}" class="related-product-btn">
+                                    <i class="fa fa-eye mr-2"></i>Ver Detalle
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{% url 'listar_productos' %}" class="btn btn-outline-primary btn-lg py-3 px-5">
+                        <i class="fa fa-th mr-2"></i>Ver Todos los Productos
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <!-- Si no hay productos relacionados -->
+            <div class="mt-5">
+                <h3 class="text-center mb-4">Más Productos</h3>
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <a href="{% url 'listar_productos' %}" class="btn btn-primary py-3 px-5">
+                            Ver Todos los Productos
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'miapp/barrabaja.html' %}
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static 'mail/jqBootstrapValidation.min.js' %}"></script>
+    <script src="{% static 'mail/contact.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var maxStock = parseInt('{{ producto.stock_disponible }}');
+            var nombreProducto = '{{ producto.nombre|escapejs }}';
+            var productoId = parseInt('{{ producto.id }}');
+            
+            var btnIncrementar = document.getElementById('btn-incrementar');
+            var btnDecrementar = document.getElementById('btn-decrementar');
+            var btnAgregar = document.getElementById('btn-agregar-carrito');
+            var inputCantidad = document.getElementById('cantidad');
+            
+            if (btnIncrementar) {
+                btnIncrementar.addEventListener('click', function() {
+                    var cantidad = parseInt(inputCantidad.value);
+                    if (cantidad < maxStock) {
+                        inputCantidad.value = cantidad + 1;
+                    }
+                });
+            }
+            
+            if (btnDecrementar) {
+                btnDecrementar.addEventListener('click', function() {
+                    var cantidad = parseInt(inputCantidad.value);
+                    if (cantidad > 1) {
+                        inputCantidad.value = cantidad - 1;
+                    }
+                });
+            }
+            
+            if (btnAgregar) {
+                btnAgregar.addEventListener('click', function() {
+                    var cantidad = parseInt(inputCantidad.value);
+                    
+                    btnAgregar.disabled = true;
+                    btnAgregar.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Agregando...';
+                    
+                    fetch('/api/cart/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            producto_id: productoId,
+                            cantidad: cantidad
+                        })
+                    })
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        if (data.carrito) {
+                            mostrarMensaje('✅ ' + data.message, 'success');
+                            
+                            if (typeof actualizarContadorCarrito === 'function') {
+                                actualizarContadorCarrito();
+                            }
+                            
+                            inputCantidad.value = 1;
+                        } else {
+                            mostrarMensaje('❌ ' + (data.error || 'Error al agregar al carrito'), 'error');
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('Error:', error);
+                        mostrarMensaje('❌ Error al agregar al carrito', 'error');
+                    })
+                    .finally(function() {
+                        btnAgregar.disabled = false;
+                        btnAgregar.innerHTML = '<i class="fa fa-shopping-cart"></i> Agregar al Carrito';
+                    });
+                });
+            }
+            
+            function getCookie(name) {
+                var cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    var cookies = document.cookie.split(';');
+                    for (var i = 0; i < cookies.length; i++) {
+                        var cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            
+            function mostrarMensaje(mensaje, tipo) {
+                var alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-' + (tipo === 'success' ? 'success' : 'danger') + ' alert-dismissible fade show';
+                alertDiv.style.position = 'fixed';
+                alertDiv.style.top = '20px';
+                alertDiv.style.right = '20px';
+                alertDiv.style.zIndex = '9999';
+                alertDiv.style.minWidth = '300px';
+                alertDiv.innerHTML = mensaje + '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+                
+                document.body.appendChild(alertDiv);
+                
+                setTimeout(function() {
+                    alertDiv.remove();
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+
+</html>

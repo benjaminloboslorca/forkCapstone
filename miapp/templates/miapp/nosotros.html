@@ -1,0 +1,311 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <title>Tres En Uno - Cultivos Organicos - Nosotros</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+
+    <link href="{% static 'img/logo.jpg' %}" rel="icon">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+    <style>
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            height: 100%;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 40px rgba(0,0,0,0.15);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 35px;
+            color: white;
+        }
+        
+        .proceso-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+        
+        .proceso-number {
+            width: 50px;
+            height: 50px;
+            background: #28a745;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .stats-box {
+            background: #28a745;
+            color: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+
+<body>
+    {% include 'miapp/barrabase.html' %}
+
+    <div class="container-fluid page-header">
+        <div class="container">
+            <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 400px">
+                <h3 class="display-4 text-white text-uppercase">Nosotros</h3>
+                <div class="d-inline-flex text-white">
+                    <p class="m-0 text-uppercase"><a class="text-white" href="{% url 'inicio' %}">Inicio</a></p>
+                    <i class="fa fa-angle-double-right pt-1 px-3"></i>
+                    <p class="m-0 text-uppercase">Nosotros</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiénes Somos -->
+    <div class="container-fluid py-5">
+        <div class="container pt-5 pb-3">
+            <div class="text-center mb-3 pb-3">
+                <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Quiénes Somos</h6>
+                <h1>Cultivando el Futuro Sustentable</h1>
+            </div>
+            
+            <div class="row mb-5">
+                <div class="col-12">
+                    <p class="text-center" style="font-size: 1.1rem; color: #6c757d; max-width: 800px; margin: 0 auto;">
+                        Somos <strong>Tres En Uno</strong>, un emprendimiento familiar dedicado a la producción de hortalizas 
+                        y vegetales orgánicos mediante el innovador sistema de acuaponía, ubicados en Los Vilos, Región de Coquimbo.
+                    </p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-leaf"></i>
+                        </div>
+                        <h4>100% Orgánico</h4>
+                        <p style="color: #6c757d;">
+                            Sin pesticidas ni químicos. Nuestros productos son completamente naturales y seguros 
+                            para tu familia.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-tint"></i>
+                        </div>
+                        <h4>Ahorro de Agua</h4>
+                        <p style="color: #6c757d;">
+                            Nuestro sistema de acuaponía utiliza hasta un 90% menos agua que la agricultura 
+                            tradicional.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fa fa-heart"></i>
+                        </div>
+                        <h4>Familiar y Local</h4>
+                        <p style="color: #6c757d;">
+                            Un proyecto familiar comprometido con la sustentabilidad y el desarrollo de 
+                            nuestra comunidad.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Proceso de Acuaponía -->
+    <div class="container-fluid py-5" style="background: #f8f9fa;">
+        <div class="container pt-5 pb-3">
+            <div class="text-center mb-5 pb-3">
+                <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Nuestro Proceso</h6>
+                <h1>Sistema de Acuaponía</h1>
+                <p style="color: #6c757d; max-width: 700px; margin: 20px auto 0;">
+                    Un sistema sustentable que combina la cría de peces con el cultivo de plantas, 
+                    creando un ecosistema autosustentable y ecológico.
+                </p>
+            </div>
+
+            <!-- Paso 1 -->
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6 mb-4">
+                    <img src="{% static 'img/nosotros/sistema-tubos.jpeg' %}" alt="Sistema de tubos" class="proceso-img">
+                </div>
+                <div class="col-lg-6">
+                    <div class="proceso-number">1</div>
+                    <h3 class="text-primary mb-3">Sistema Hidropónico de Tubos</h3>
+                    <p style="color: #6c757d; line-height: 1.8;">
+                        Utilizamos tubos especialmente diseñados donde las plantas crecen suspendidas, 
+                        permitiendo que sus raíces reciban los nutrientes directamente del agua enriquecida 
+                        por los desechos de los peces. Este sistema maximiza el espacio y optimiza el 
+                        crecimiento de cada planta.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Paso 2 -->
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6 order-lg-2 mb-4">
+                    <img src="{% static 'img/nosotros/planta-individual.jpeg' %}" alt="Planta en crecimiento" class="proceso-img">
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <div class="proceso-number">2</div>
+                    <h3 class="text-primary mb-3">Germinación y Crecimiento</h3>
+                    <p style="color: #6c757d; line-height: 1.8;">
+                        Cada semilla es cuidadosamente germinada en un medio de soporte natural. 
+                        Las plantas crecen en condiciones controladas, recibiendo exactamente los nutrientes 
+                        que necesitan para desarrollarse fuertes y saludables. Este proceso garantiza 
+                        plantas vigorosas con alto contenido nutricional.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Paso 3 -->
+            <div class="row align-items-center mb-5">
+                <div class="col-lg-6 mb-4">
+                    <img src="{% static 'img/nosotros/bandejas-germinacion.jpeg' %}" alt="Bandejas de germinación" class="proceso-img">
+                </div>
+                <div class="col-lg-6">
+                    <div class="proceso-number">3</div>
+                    <h3 class="text-primary mb-3">Bandejas de Germinación</h3>
+                    <p style="color: #6c757d; line-height: 1.8;">
+                        Nuestras bandejas de germinación albergan cientos de plántulas en sus primeras 
+                        etapas de desarrollo. Aquí monitoreamos cuidadosamente cada brote, asegurando 
+                        condiciones óptimas de humedad, temperatura y nutrientes. Este proceso artesanal 
+                        garantiza plantas de alta calidad desde el inicio.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Paso 4 -->
+            <div class="row align-items-center">
+                <div class="col-lg-6 order-lg-2 mb-4">
+                    <img src="{% static 'img/nosotros/vista-general.jpeg' %}" alt="Vista general" class="proceso-img">
+                </div>
+                <div class="col-lg-6 order-lg-1">
+                    <div class="proceso-number">4</div>
+                    <h3 class="text-primary mb-3">Nuestra Instalación</h3>
+                    <p style="color: #6c757d; line-height: 1.8;">
+                        Ubicados en Los Vilos, Región de Coquimbo, nuestras instalaciones combinan 
+                        tecnología moderna con prácticas sustentables. El entorno natural de la zona 
+                        proporciona condiciones ideales para nuestro sistema de acuaponía, permitiéndonos 
+                        producir alimentos frescos y saludables durante todo el año.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="container-fluid py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stats-box">
+                        <div class="stat-number">90%</div>
+                        <div class="stat-label">Menos Agua</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stats-box">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Pesticidas</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stats-box">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Orgánico</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="stats-box">
+                        <div class="stat-number">365</div>
+                        <div class="stat-label">Días al Año</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="container-fluid py-5" style="background: #f8f9fa;">
+        <div class="container text-center py-5">
+            <h2 class="mb-4">¿Listo para Probar Productos Verdaderamente Orgánicos?</h2>
+            <p class="mb-4" style="font-size: 1.2rem; color: #6c757d;">
+                Descubre la diferencia de los vegetales cultivados con acuaponía
+            </p>
+            <a href="{% url 'listar_productos' %}" class="btn btn-primary py-3 px-5">
+                <i class="fa fa-shopping-bag mr-2"></i>Ver Nuestros Productos
+            </a>
+        </div>
+    </div>
+
+    {% include 'miapp/barrabaja.html' %}
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+    <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+    <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+    <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+    <script src="{% static 'mail/jqBootstrapValidation.min.js' %}"></script>
+    <script src="{% static 'mail/contact.js' %}"></script>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+
+</html>

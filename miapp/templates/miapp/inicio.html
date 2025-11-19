@@ -1,0 +1,313 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+
+    <head>
+        <meta charset="utf-8">
+        <title>Tres En Uno - Cultivos Organicos Inicio</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="Free HTML Templates" name="keywords">
+        <meta content="Free HTML Templates" name="description">
+
+        <link href="{% static 'img/logo.jpg' %}" rel="icon">
+
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+            rel="stylesheet">
+
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css"
+            rel="stylesheet">
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+        <link href="{% static 'lib/owlcarousel/assets/owl.carousel.min.css' %}"
+            rel="stylesheet">
+
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    </head>
+
+    <body>
+
+        {% include 'miapp/barrabase.html' %}
+
+                {% include 'miapp/chatbot.html' %}
+
+        <div class="container-fluid p-0">
+            <div id="header-carousel" class="carousel slide"
+                data-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img class="w-100"
+                            src="{% static 'img/carrucel1.jpg' %}" alt="Image">
+                        <div
+                            class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                            <div class="p-3" style="max-width: 900px;">
+                                <h4
+                                    class="text-white text-uppercase mb-md-3">Cultivos
+                                    Biogenicos</h4>
+                                <h3
+                                    class="display-3 text-white mb-md-4">Sembramos
+                                    Confianza, Cultivamos Resultados</h3>
+                                <a href="{% url 'listar_productos' %}"
+                                    class="btn btn-primary py-md-3 px-md-5 mt-2">Ver</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="carousel-item">
+                        <img class="w-100"
+                            src="{% static 'img/carrucel2.jpg' %}" alt="Image">
+                        <div
+                            class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                            <div class="p-3" style="max-width: 900px;">
+                                <h4
+                                    class="text-white text-uppercase mb-md-3">Nosotros</h4>
+                                <h1 class="display-3 text-white mb-md-4">Te
+                                    invitamos a conocernos</h1>
+                                <a href="{% url 'nosotros' %}"
+                                    class="btn btn-primary py-md-3 px-md-5 mt-2">Ver</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <a class="carousel-control-prev" href="#header-carousel"
+                    data-slide="prev">
+                    <div class="btn btn-dark"
+                        style="width: 45px; height: 45px;">
+                        <span class="carousel-control-prev-icon mb-n2"></span>
+                    </div>
+                </a>
+                <a class="carousel-control-next" href="#header-carousel"
+                    data-slide="next">
+                    <div class="btn btn-dark"
+                        style="width: 45px; height: 45px;">
+                        <span class="carousel-control-next-icon mb-n2"></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="container-fluid py-5">
+            <div class="container pt-5">
+                <div class="row">
+                    <div class="col-lg-6" style="min-height: 500px;">
+                        <div class="position-relative h-100">
+                            <img class="position-absolute w-100 h-100"
+                                src="{% static 'img/nosotros1.jpg' %}"
+                                style="object-fit: cover;">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 pt-5 pb-lg-5">
+                        <div class="about-text bg-white p-4 p-lg-5 my-lg-5">
+                            <h6 class="text-primary text-uppercase"
+                                style="letter-spacing: 5px;">Nosotros</h6>
+                            <h1 class="mb-3">Acuaponia: La nueva forma de
+                                cultivar</h1>
+                            <p> La producción tradicional de hortalizas,enfrenta
+                                desafíos como el uso excesivo de agua, la
+                                degradación del suelo, con una dependencia de
+                                agroquímicos. La agroponía surge como una
+                                alternativa innovadora, al permitir el cultivo
+                                sin tierra, optimizando recursos y reduciendo el
+                                impacto ambiental.</p>
+                            <p>
+                                Nuestra solución es un sistema modular de
+                                acuaponía automatizada que permite el cultivo de
+                                hortalizas espacios reducidos, sin necesidad de
+                                tierra el cual reduce hasta un 90% el consumo
+                                hídrico. </p>
+                            <a href="{% url 'nosotros' %}"
+                                class="btn btn-primary mt-1">Ver Mas</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid py-5">
+            <div class="container pt-5 pb-3">
+                <div class="text-center mb-3 pb-3">
+                    <h6 class="text-primary text-uppercase"
+                        style="letter-spacing: 5px;">Servicios</h6>
+                    <h1>Compras y Envios</h1>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div
+                            class="service-item bg-white text-center mb-2 py-5 px-4">
+                            <i class="fa fa-2x fa-truck mx-auto mb-4"></i>
+                            <h5 class="mb-2">Envios</h5>
+                            <p class="m-0">Realizamos despachos desde Arica a
+                                Punta Arenas, asegurando que nuestros productos
+                                lleguen a cada rincón del país con seguridad y
+                                puntualidad.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div
+                            class="service-item bg-white text-center mb-2 py-5 px-4">
+                            <i class="fa fa-2x fa-phone-alt mx-auto mb-4"></i>
+                            <h5 class="mb-2">Compras</h5>
+                            <p class="m-0">¿Tienes dudas o necesitas ayuda antes
+                                de comprar? Nuestro equipo está disponible para
+                                brindarte orientación y asegurarte de que elijas
+                                el producto ideal para ti.</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div
+                            class="service-item bg-white text-center mb-2 py-5 px-4">
+                            <i class="fa fa-2x fa-home mx-auto mb-4"></i>
+                            <h5 class="mb-2">Pick Up</h5>
+                            <p class="m-0">Si estás cerca de nuestra planta de
+                                producción, puedes optar por retirar tu pedido
+                                directamente, coordinando previamente con
+                                nosotros. Así ganas tiempo y ahorras en costos
+                                de envío.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'listar_productos' %}" class="btn btn-primary py-3 px-5">Ver más Productos</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TOP PRODUCTOS MÁS VENDIDOS -->
+        <!-- ========================================== -->
+        <div class="container-fluid py-5" style="background-color: #f8f9fa;">
+            <div class="container pt-5 pb-3">
+                <div class="text-center mb-3 pb-3">
+                    <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Top Ventas</h6>
+                    <h1>Productos Más Vendidos</h1>
+                    <p class="text-muted">Los favoritos de nuestros clientes en los últimos 30 días</p>
+                </div>
+                
+                <div class="row">
+                    {% for producto in productos_top_vendidos %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="package-item bg-white mb-2" style="box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
+                            <!-- Imagen del producto -->
+                            <div style="position: relative;">
+                                <img class="img-fluid w-100" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" 
+                                     style="height: 250px; object-fit: cover;">
+                                
+                                <!-- Badge de Top Ventas -->
+                                <div style="position: absolute; top: 10px; left: 10px; background-color: #ff6b6b; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 12px;">
+                                    <i class="fa fa-fire"></i> TOP {{ forloop.counter }}
+                                </div>
+                            </div>
+                            
+                            <div class="p-4">
+                                <!-- Información básica -->
+                                <div class="d-flex justify-content-between mb-3">
+                                    <small class="m-0">
+                                        <i class="fa fa-box text-primary mr-2"></i>{{ producto.unidad_medida }}
+                                    </small>
+                                    {% if producto.stock_disponible > 0 %}
+                                        <small class="m-0 text-success">
+                                            <i class="fa fa-check-circle mr-1"></i>{{ producto.stock_disponible }} disponibles
+                                        </small>
+                                    {% else %}
+                                        <small class="m-0 text-danger">
+                                            <i class="fa fa-times-circle mr-1"></i>Agotado
+                                        </small>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Nombre del producto -->
+                                <a class="h5 text-decoration-none text-dark" href="{% url 'detalle_producto' producto.id %}">
+                                    {{ producto.nombre }}
+                                </a>
+                                
+                                <!-- Descripción corta -->
+                                <p class="text-muted mt-2 mb-3" style="height: 60px; overflow: hidden;">
+                                    {{ producto.descripcion|truncatewords:15 }}
+                                </p>
+                                
+                                <!-- Precio y botón -->
+                                <div class="border-top pt-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <!-- Precio -->
+                                        <div>
+                                            {% if producto.ofertas_activas %}
+                                                {% with oferta=producto.ofertas_activas.0 %}
+                                                <h5 class="m-0">
+                                                    <span class="text-danger font-weight-bold">
+                                                        ${{ oferta.precio_oferta|floatformat:0 }}
+                                                    </span>
+                                                </h5>
+                                                <small class="text-muted" style="text-decoration: line-through;">
+                                                    ${{ producto.precio_unitario|floatformat:0 }}
+                                                </small>
+                                                <span class="badge badge-danger ml-2">
+                                                    -{{ oferta.porcentaje_descuento|floatformat:0 }}%
+                                                </span>
+                                                {% endwith %}
+                                            {% else %}
+                                                <h5 class="m-0 text-primary font-weight-bold">
+                                                    ${{ producto.precio_unitario|floatformat:0 }}
+                                                </h5>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Botón -->
+                                        {% if producto.stock_disponible > 0 %}
+                                            <a href="{% url 'detalle_producto' producto.id %}" 
+                                               class="btn btn-primary btn-sm">
+                                                <i class="fa fa-eye mr-1"></i> Ver Detalle
+                                            </a>
+                                        {% else %}
+                                            <span class="badge badge-secondary py-2 px-3">
+                                                No disponible
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <!-- Si no hay productos más vendidos -->
+                    <div class="col-12 text-center py-5">
+                        <i class="fa fa-shopping-basket fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Aún no hay productos más vendidos.</p>
+                        <a href="{% url 'listar_productos' %}" class="btn btn-primary mt-3">
+                            Ver Todos los Productos
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Botón para ver más productos -->
+                {% if productos_top_vendidos %}
+                <div class="text-center mt-4">
+                    <a href="{% url 'listar_productos' %}" class="btn btn-primary py-3 px-5">
+                        Ver Todos los Productos
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- ========================================== -->
+        <!-- FIN: TOP PRODUCTOS MÁS VENDIDOS -->
+        <!-- ========================================== -->
+
+        {% include 'miapp/barrabaja.html' %}
+
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+        <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
+
+        <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
+        <script src="{% static 'lib/counterup/counterup.min.js' %}"></script>
+
+        <script src="{% static 'mail/jqBootstrapValidation.min.js' %}"></script>
+        <script src="{% static 'mail/contact.js' %}"></script>
+
+        <script src="{% static 'js/main.js' %}"></script>
+    </body>
+
+</html>

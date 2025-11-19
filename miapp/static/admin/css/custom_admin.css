@@ -1,0 +1,85 @@
+/* ===== SOLUCIÓN SIMPLE: ZOOM 90% EN ADMIN ===== */
+
+/* Aplicar zoom del 90% a todo el contenido del admin */
+body {
+    zoom: 0.9;
+    -moz-transform: scale(0.9);
+    -moz-transform-origin: 0 0;
+}
+
+/* Para Firefox que no soporta zoom */
+@-moz-document url-prefix() {
+    body {
+        transform: scale(0.9);
+        transform-origin: 0 0;
+        width: 111.11%;
+    }
+}
+
+/* Ajustar el padding de todas las celdas */
+#result_list td {
+    padding: 6px 8px !important;
+    vertical-align: middle !important;
+}
+
+#result_list th {
+    padding: 8px 8px !important;
+    vertical-align: middle !important;
+}
+
+/* Permitir que las filas crezcan según el contenido */
+#result_list tbody tr {
+    min-height: 40px;
+    height: auto !important;
+}
+
+#result_list tbody td {
+    line-height: 1.4;
+    padding-top: 6px !important;
+    padding-bottom: 6px !important;
+    height: auto !important;
+}
+
+/* Asegurar que los spans de badges no se corten */
+#result_list td span {
+    display: inline-block !important;
+    white-space: nowrap !important;
+    overflow: visible !important;
+}
+
+/* Badges con padding legible */
+.field-estado_badge span,
+.field-tipo_cliente span,
+.field-activa_badge span,
+.field-activo_badge span,
+.field-stock_badge span {
+    padding: 4px 8px !important;
+    border-radius: 3px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    display: inline-block !important;
+}
+
+/* Mejorar visualización general */
+#result_list {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+}
+
+/* Checkbox de selección */
+#result_list .action-checkbox {
+    width: 28px !important;
+    min-width: 28px !important;
+    padding: 4px !important;
+}
+
+/* IMPORTANTE: Las celdas deben poder expandirse verticalmente */
+#result_list td {
+    overflow: visible !important;
+    vertical-align: top !important;
+}
+
+#result_list tr {
+    height: auto !important;
+}
