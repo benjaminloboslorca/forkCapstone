@@ -1,5 +1,10 @@
 [build]
 builder = "NIXPACKS"
 
+[build.nixpacks]
+pkgs = ["python310", "gcc"]
+
 [deploy]
 startCommand = "gunicorn tres_en_uno.wsgi --log-file -"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10
