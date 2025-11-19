@@ -3,13 +3,18 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+.Python
 
 # Entorno virtual
 venv/
 env/
+ENV/
+fork1/
 
 # Base de datos
 *.sqlite3
+db.sqlite3
+*.sqlite3.backup
 db.sqlite3.backup
 
 # Archivos sensibles
@@ -17,16 +22,20 @@ db.sqlite3.backup
 *.log
 security.log
 
-# Archivos estáticos compilados
+# Archivos estáticos COMPILADOS (solo ignorar staticfiles/)
 staticfiles/
 
-# Media (opcional)
+# Media (descomentar si no quieres subir imágenes)
 # media/
 
 # Sistema
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
 
 # IDEs
 .vscode/
 .idea/
+*.sublime-project
+*.sublime-workspace
