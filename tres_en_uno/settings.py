@@ -159,9 +159,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # Directorios donde Django busca archivos estáticos
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+STATICFILES_DIRS = []
+
 
 
 # Carpeta donde collectstatic recopila todos los archivos para producción
