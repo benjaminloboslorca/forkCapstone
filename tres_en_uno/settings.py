@@ -161,6 +161,7 @@ STATIC_URL = '/static/'
 # Directorios donde Django busca archivos estáticos
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
+    BASE_DIR / 'miapp' / 'static',
 ]
 
 # Carpeta donde collectstatic recopila todos los archivos para producción
