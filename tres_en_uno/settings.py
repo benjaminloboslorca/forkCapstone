@@ -25,6 +25,14 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 # ALLOWED_HOSTS - Dinámico para Railway
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
+# Agregar dominios personalizados
+ALLOWED_HOSTS.extend([
+    'tresenunocultivos.cl',
+    'www.tresenunocultivos.cl',
+    '79f7eqts.up.railway.app',
+    's51effwy.up.railway.app',
+])
+
 # En Railway, agregar automáticamente el dominio de Railway
 if 'RAILWAY_STATIC_URL' in os.environ:
     railway_url = os.environ.get('RAILWAY_STATIC_URL', '')
@@ -160,8 +168,6 @@ STATIC_URL = '/static/'
 
 # Directorios donde Django busca archivos estáticos
 STATICFILES_DIRS = []
-
-
 
 # Carpeta donde collectstatic recopila todos los archivos para producción
 STATIC_ROOT = BASE_DIR / 'staticfiles'
