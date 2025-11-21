@@ -23,3 +23,4 @@ if not Cliente.objects.filter(correo=EMAIL).exists():
     print(f"✅ Superusuario creado: {EMAIL}")
 else:
     print(f"⚠️ El superusuario {EMAIL} ya existe")
+    #echo
