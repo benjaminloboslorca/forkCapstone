@@ -224,7 +224,8 @@
     </div>
 
     <script>
-        const API_BASE_URL = 'http://127.0.0.1:8000';
+        // ✅ CORREGIDO: Usar dominio actual dinámicamente
+        const API_BASE_URL = window.location.origin;
         const mensajeDiv = document.getElementById('mensaje');
         const loginForm = document.getElementById('loginForm');
 
