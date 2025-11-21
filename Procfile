@@ -1,1 +1,1 @@
-web: python create_superuser.py && python manage.py collectstatic --noinput && python manage.py migrate && gunicorn tres_en_uno.wsgi --log-file -
+web: python manage.py collectstatic --noinput && python manage.py migrate && gunicorn tres_en_uno.wsgi --log-file -
