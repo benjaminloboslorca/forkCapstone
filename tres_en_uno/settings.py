@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
-import dj_database_url  # ← NUEVO: Para Railway
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -16,16 +16,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # CONFIGURACIÓN BÁSICA
 # ==============================================================================
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # ALLOWED_HOSTS - Dinámico para Railway
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
-# Agregar dominios personalizados
 ALLOWED_HOSTS.extend([
     'tresenunocultivos.cl',
     'www.tresenunocultivos.cl',
@@ -33,14 +29,12 @@ ALLOWED_HOSTS.extend([
     's51effwy.up.railway.app',
 ])
 
-# En Railway, agregar automáticamente el dominio de Railway
 if 'RAILWAY_STATIC_URL' in os.environ:
     railway_url = os.environ.get('RAILWAY_STATIC_URL', '')
     railway_domain = railway_url.replace('https://', '').replace('http://', '')
     if railway_domain and railway_domain not in ALLOWED_HOSTS:
         ALLOWED_HOSTS.append(railway_domain)
 
-# Si existe RAILWAY_PUBLIC_DOMAIN, usarlo también
 if 'RAILWAY_PUBLIC_DOMAIN' in os.environ:
     ALLOWED_HOSTS.append(os.environ['RAILWAY_PUBLIC_DOMAIN'])
 
@@ -54,18 +48,18 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',  # ANTES de staticfiles
     'django.contrib.staticfiles',
+    'cloudinary',  # DESPUÉS de staticfiles
     'miapp',
     'rest_framework',
     'rest_framework_simplejwt',
-    'cloudinary',
-    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.gzip.GZipMiddleware',  # Compresión
+    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← NUEVO: Para archivos estáticos
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'miapp.security_middleware.SecurityHeadersMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -104,10 +98,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'tres_en_uno.wsgi.application'
 
 # ==============================================================================
-# DATABASE - Configuración dual (Local y Railway)
+# DATABASE
 # ==============================================================================
 
-# Intentar obtener DATABASE_URL desde .env o variables de entorno
 DATABASE_URL = config('DATABASE_URL', default=None)
 
 if DATABASE_URL:
@@ -137,21 +130,10 @@ else:
 # ==============================================================================
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 8}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # ==============================================================================
@@ -164,30 +146,22 @@ USE_I18N = True
 USE_TZ = True
 
 # ==============================================================================
-# STATIC FILES (CSS, JavaScript, Images)
+# STATIC FILES
 # ==============================================================================
 
 STATIC_URL = '/static/'
-
-# Directorios donde Django busca archivos estáticos
 STATICFILES_DIRS = []
-
-# Carpeta donde collectstatic recopila todos los archivos para producción
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
-
-# Whitenoise para comprimir y servir archivos estáticos
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ==============================================================================
-# MEDIA FILES (Archivos subidos por usuarios)
+# MEDIA FILES - Cloudinary en producción, local en desarrollo
 # ==============================================================================
 
-# MEDIA FILES (Archivos subidos por usuarios)
 if not DEBUG:
     import cloudinary
     import cloudinary.uploader
@@ -206,16 +180,14 @@ else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
-# Límites de archivos subidos
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 # ==============================================================================
 # AUTHENTICATION
 # ==============================================================================
 
 AUTH_USER_MODEL = 'miapp.Cliente'
-
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/perfil/'
 LOGOUT_REDIRECT_URL = '/'
@@ -239,7 +211,7 @@ SIMPLE_JWT = {
 }
 
 # ==============================================================================
-# EMAIL CONFIGURATION
+# EMAIL
 # ==============================================================================
 
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
@@ -254,24 +226,21 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 # SITE CONFIGURATION
 # ==============================================================================
 
-# URL del sitio (se ajusta automáticamente en Railway)
 if 'RAILWAY_STATIC_URL' in os.environ:
     SITE_URL = os.environ.get('RAILWAY_STATIC_URL', 'http://127.0.0.1:8000')
 else:
     SITE_URL = 'http://127.0.0.1:8000'
 
 # ==============================================================================
-# CACHE CONFIGURATION
+# CACHE
 # ==============================================================================
 
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'tresenuno-cache',
-        'TIMEOUT': 300,  # 5 minutos
-        'OPTIONS': {
-            'MAX_ENTRIES': 1000
-        }
+        'TIMEOUT': 300,
+        'OPTIONS': {'MAX_ENTRIES': 1000}
     }
 }
 
@@ -279,62 +248,44 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 
 # ==============================================================================
-# SECURITY SETTINGS
+# SECURITY SETTINGS - OPTIMIZADO PARA RAILWAY
 # ==============================================================================
 
 # CSRF Protection
-CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_HTTPONLY = False  # False para que el admin funcione
 CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_USE_SESSIONS = False
 CSRF_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_DOMAIN = None
 
-# En producción (Railway), estas deben ser True
 if not DEBUG:
-    CSRF_COOKIE_SECURE = True
     CSRF_TRUSTED_ORIGINS = [
         'https://tresenunocultivos.cl',
         'https://www.tresenunocultivos.cl',
         'https://*.railway.app',
     ]
-else:
-    CSRF_COOKIE_SECURE = False
 
 # Session Security
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Strict'
-SESSION_COOKIE_AGE = 3600  # 1 hora
+SESSION_COOKIE_SAMESITE = 'Lax'  # Lax para compatibilidad
+SESSION_COOKIE_AGE = 3600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True
-
-if not DEBUG:
-    SESSION_COOKIE_SECURE = True
-else:
-    SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_SECURE = not DEBUG
 
 # XSS Protection
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+X_FRAME_OPTIONS = 'SAMEORIGIN'  # Cambiar a SAMEORIGIN para el admin
 
-# ==============================================================================
-# HTTPS/SSL Configuration - CORREGIDO PARA RAILWAY
-# ==============================================================================
+# HTTPS/SSL - Railway maneja HTTPS
 if not DEBUG:
-    # Railway ya maneja HTTPS, así que NO forzamos redirección
-    SECURE_SSL_REDIRECT = False  # ← CAMBIO CRÍTICO
-    
-    # Pero confiamos en el proxy de Railway
+    SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    
-    # Otras configuraciones de seguridad
-    SECURE_HSTS_SECONDS = 31536000  # 1 año
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
     SECURE_REFERRER_POLICY = 'same-origin'
     SECURE_CROSS_ORIGIN_OPENER_POLICY = 'same-origin-allow-popups'
-else:
-    SECURE_SSL_REDIRECT = False
-    SECURE_PROXY_SSL_HEADER = None
 
 # ==============================================================================
 # LOGGING
@@ -380,7 +331,6 @@ LOGGING = {
     },
 }
 
-# En desarrollo, mostrar queries SQL
 if DEBUG:
     LOGGING['loggers']['django.db.backends'] = {
         'handlers': ['console'],
@@ -392,9 +342,5 @@ if DEBUG:
 # ==============================================================================
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# Paginación
 PAGINATION_PER_PAGE = 12
-
-# Timeouts
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000
