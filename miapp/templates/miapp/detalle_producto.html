@@ -314,8 +314,9 @@
                             </div>
                         {% endif %}
                         
+                        {# ✅ CORREGIDO: Usa get_imagen_url en vez de imagen.url #}
                         {% if producto.imagen %}
-                            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image-main">
+                            <img src="{{ producto.get_imagen_url }}" alt="{{ producto.nombre }}" class="product-image-main">
                         {% else %}
                             <img src="{% static 'img/default-product.jpg' %}" alt="Sin imagen" class="product-image-main">
                         {% endif %}
@@ -454,8 +455,9 @@
                                 {% endif %}
                                 
                                 <a href="{% url 'detalle_producto' prod_rel.id %}">
+                                    {# ✅ CORREGIDO: Usa get_imagen_url en vez de imagen.url #}
                                     {% if prod_rel.imagen %}
-                                        <img src="{{ prod_rel.imagen.url }}" alt="{{ prod_rel.nombre }}" class="related-product-img">
+                                        <img src="{{ prod_rel.get_imagen_url }}" alt="{{ prod_rel.nombre }}" class="related-product-img">
                                     {% else %}
                                         <img src="{% static 'img/default-product.jpg' %}" alt="Sin imagen" class="related-product-img">
                                     {% endif %}
