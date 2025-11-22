@@ -284,15 +284,17 @@ SESSION_CACHE_ALIAS = 'default'
 
 # CSRF Protection
 CSRF_COOKIE_HTTPONLY = True
-CSRF_COOKIE_SAMESITE = 'Strict'
+CSRF_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_DOMAIN = None
 
 # En producción (Railway), estas deben ser True
 if not DEBUG:
     CSRF_COOKIE_SECURE = True
     CSRF_TRUSTED_ORIGINS = [
-        'https://*.railway.app',
         'https://tresenunocultivos.cl',
         'https://www.tresenunocultivos.cl',
+        'https://*.railway.app',
     ]
 else:
     CSRF_COOKIE_SECURE = False
