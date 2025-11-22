@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.utils.html import strip_tags 
 
 import json
+import logging
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 from .chatbot_logic import best_intent, RESPUESTAS, FALLBACK
@@ -49,6 +50,9 @@ from functools import wraps
 from django.shortcuts import redirect
 
 from django.utils.timezone import localtime
+
+# Configurar logging
+logger = logging.getLogger(__name__)
 
 
 # ===== VISTAS HTML =====
@@ -131,7 +135,7 @@ def detalle_producto(request, producto_id):
     
     # ===== PRODUCTOS RELACIONADOS (MISMA CATEGORÍA) =====
     productos_relacionados = Producto.objects.filter(
-        categoria=producto.categoria,  # ← PROBABLEMENTE SEA ASÍ
+        categoria=producto.categoria,
         activo=True
     ).exclude(
         id=producto.id
@@ -148,7 +152,7 @@ def detalle_producto(request, producto_id):
     contexto = {
         'producto': producto,
         'ofertas': ofertas_activas,
-        'productos_relacionados': productos_relacionados,  # ← LÍNEA NUEVA
+        'productos_relacionados': productos_relacionados,
         'now': timezone.now(),
     }
     
@@ -590,79 +594,80 @@ def ver_carrito(request):
 def enviar_correo_confirmacion_pedido(pedido):
     """
     Envía correo de confirmación al cliente con instrucciones de pago
+    NOTA: Esta función NO lanza excepciones para evitar rollback de transacciones
     """
-    asunto = f'Pedido #{pedido.id} - Confirmación y Datos de Pago'
-    
-    detalles = pedido.detalles.all()
-    
-    # Contexto para el template
-    contexto = {
-        'pedido': pedido,
-        'detalles': detalles,
-        'banco': 'Banco Estado',
-        'tipo_cuenta': 'Cuenta Vista',
-        'numero_cuenta': '90272246717',
-        'rut': '77.851.212-2',
-        'titular': 'Tres en uno',
-        'correo_contacto': 'ventas.tresenuno@gmail.com',
-    }
-    
-    mensaje_html = f"""
-    <html>
-        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #28a745;">¡Gracias por tu pedido!</h2>
-            
-            <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
-                <h3>Pedido #{pedido.id}</h3>
-                <p><strong>Fecha:</strong> {localtime(pedido.fecha_pedido).strftime('%d/%m/%Y %H:%M')}</p>
-                <p><strong>Total:</strong> ${pedido.total_pedido:,.0f}</p>
-                <p><strong>Estado:</strong> {pedido.get_estado_pedido_display()}</p>
-            </div>
-            
-            <h3>Productos:</h3>
-            <ul>
-    """
-    
-    for detalle in detalles:
-        mensaje_html += f"<li>{detalle.cantidad} x {detalle.producto.nombre} - ${detalle.precio_compra:,.0f}</li>"
-    
-    mensaje_html += f"""
-            </ul>
-            
-            <div style="background: #fff3cd; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;">
-                <h3 style="margin-top: 0;">💳 Datos para Transferencia</h3>
-                <p><strong>Banco:</strong> {contexto['banco']}</p>
-                <p><strong>Tipo de Cuenta:</strong> {contexto['tipo_cuenta']}</p>
-                <p><strong>Número de Cuenta:</strong> {contexto['numero_cuenta']}</p>
-                <p><strong>RUT:</strong> {contexto['rut']}</p>
-                <p><strong>Titular:</strong> {contexto['titular']}</p>
-                <p><strong>Monto a transferir:</strong> ${pedido.total_pedido:,.0f}</p>
-                <p style="color: #856404;"><strong>⚠️ Importante:</strong> Incluye el número de pedido #{pedido.id} en el mensaje de la transferencia.</p>
-            </div>
-            
-            <div style="background: #d4edda; padding: 20px; border-radius: 5px; margin: 20px 0;">
-                <h3 style="margin-top: 0;">📦 Dirección de Envío</h3>
-                <p>{pedido.direccion}</p>
-                <p>{pedido.comuna}, {pedido.region}</p>
-                {f'<p><strong>Referencia:</strong> {pedido.referencia_direccion}</p>' if pedido.referencia_direccion else ''}
-            </div>
-            
-            <p>Una vez confirmado el pago, procesaremos tu pedido y te enviaremos la información de seguimiento.</p>
-            
-            <p>Si tienes alguna duda, contáctanos a: <a href="mailto:{contexto['correo_contacto']}">{contexto['correo_contacto']}</a></p>
-            
-            <hr style="margin: 30px 0;">
-            <p style="color: #6c757d; font-size: 12px;">
-                Tres En Uno - Cultivos Orgánicos<br>
-                Este es un correo automático, por favor no respondas a este mensaje.
-            </p>
-        </body>
-    </html>
-    """
-    
-    mensaje_texto = strip_tags(mensaje_html)
-    
     try:
+        asunto = f'Pedido #{pedido.id} - Confirmación y Datos de Pago'
+        
+        detalles = pedido.detalles.all()
+        
+        # Contexto para el template
+        contexto = {
+            'pedido': pedido,
+            'detalles': detalles,
+            'banco': 'Banco Estado',
+            'tipo_cuenta': 'Cuenta Vista',
+            'numero_cuenta': '90272246717',
+            'rut': '77.851.212-2',
+            'titular': 'Tres en uno',
+            'correo_contacto': 'ventas.tresenuno@gmail.com',
+        }
+        
+        mensaje_html = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #28a745;">¡Gracias por tu pedido!</h2>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+                    <h3>Pedido #{pedido.id}</h3>
+                    <p><strong>Fecha:</strong> {localtime(pedido.fecha_pedido).strftime('%d/%m/%Y %H:%M')}</p>
+                    <p><strong>Total:</strong> ${pedido.total_pedido:,.0f}</p>
+                    <p><strong>Estado:</strong> {pedido.get_estado_pedido_display()}</p>
+                </div>
+                
+                <h3>Productos:</h3>
+                <ul>
+        """
+        
+        for detalle in detalles:
+            mensaje_html += f"<li>{detalle.cantidad} x {detalle.producto.nombre} - ${detalle.precio_compra:,.0f}</li>"
+        
+        mensaje_html += f"""
+                </ul>
+                
+                <div style="background: #fff3cd; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                    <h3 style="margin-top: 0;">💳 Datos para Transferencia</h3>
+                    <p><strong>Banco:</strong> {contexto['banco']}</p>
+                    <p><strong>Tipo de Cuenta:</strong> {contexto['tipo_cuenta']}</p>
+                    <p><strong>Número de Cuenta:</strong> {contexto['numero_cuenta']}</p>
+                    <p><strong>RUT:</strong> {contexto['rut']}</p>
+                    <p><strong>Titular:</strong> {contexto['titular']}</p>
+                    <p><strong>Monto a transferir:</strong> ${pedido.total_pedido:,.0f}</p>
+                    <p style="color: #856404;"><strong>⚠️ Importante:</strong> Incluye el número de pedido #{pedido.id} en el mensaje de la transferencia.</p>
+                </div>
+                
+                <div style="background: #d4edda; padding: 20px; border-radius: 5px; margin: 20px 0;">
+                    <h3 style="margin-top: 0;">📦 Dirección de Envío</h3>
+                    <p>{pedido.direccion}</p>
+                    <p>{pedido.comuna}, {pedido.region}</p>
+                    {f'<p><strong>Referencia:</strong> {pedido.referencia_direccion}</p>' if pedido.referencia_direccion else ''}
+                </div>
+                
+                <p>Una vez confirmado el pago, procesaremos tu pedido y te enviaremos la información de seguimiento.</p>
+                
+                <p>Si tienes alguna duda, contáctanos a: <a href="mailto:{contexto['correo_contacto']}">{contexto['correo_contacto']}</a></p>
+                
+                <hr style="margin: 30px 0;">
+                <p style="color: #6c757d; font-size: 12px;">
+                    Tres En Uno - Cultivos Orgánicos<br>
+                    Este es un correo automático, por favor no respondas a este mensaje.
+                </p>
+            </body>
+        </html>
+        """
+        
+        mensaje_texto = strip_tags(mensaje_html)
+        
         email = EmailMultiAlternatives(
             asunto,
             mensaje_texto,
@@ -670,62 +675,72 @@ def enviar_correo_confirmacion_pedido(pedido):
             [pedido.correo_cliente]
         )
         email.attach_alternative(mensaje_html, "text/html")
-        email.send()
+        email.send(fail_silently=True)  # No lanzar excepción si falla
+        
+        logger.info(f"Correo de confirmación enviado para pedido #{pedido.id}")
         return True
+        
     except Exception as e:
-        print(f"Error al enviar correo: {e}")
+        logger.error(f"Error al enviar correo de confirmación para pedido #{pedido.id}: {str(e)}")
         return False
 
 
 def enviar_correo_admin_nuevo_pedido(pedido):
     """
     Notifica al administrador sobre un nuevo pedido
+    NOTA: Esta función NO lanza excepciones para evitar rollback de transacciones
     """
-    asunto = f'🛒 Nuevo Pedido #{pedido.id} - {pedido.nombre_cliente}'
-    
-    detalles = pedido.detalles.all()
-    
-    mensaje = f"""
-    Se ha recibido un nuevo pedido en Tres En Uno.
-    
-    PEDIDO #{pedido.id}
-    Fecha: {pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M')}
-    Estado: {pedido.get_estado_pedido_display()}
-    Total: ${pedido.total_pedido:,.0f}
-    
-    CLIENTE:
-    Nombre: {pedido.nombre_cliente}
-    Email: {pedido.correo_cliente}
-    Teléfono: {pedido.telefono_cliente}
-    
-    DIRECCIÓN DE ENVÍO:
-    {pedido.direccion}
-    {pedido.comuna}, {pedido.region}
-    {f'Referencia: {pedido.referencia_direccion}' if pedido.referencia_direccion else ''}
-    
-    PRODUCTOS:
-    """
-    
-    for detalle in detalles:
-        mensaje += f"\n- {detalle.cantidad} x {detalle.producto.nombre} - ${detalle.precio_compra:,.0f}"
-    
-    mensaje += f"""
-    
-    Para gestionar este pedido, ingresa al panel de administración:
-    {settings.SITE_URL}/admin/miapp/pedido/{pedido.id}/
-    """
-    
     try:
+        asunto = f'🛒 Nuevo Pedido #{pedido.id} - {pedido.nombre_cliente}'
+        
+        detalles = pedido.detalles.all()
+        
+        mensaje = f"""
+        Se ha recibido un nuevo pedido en Tres En Uno.
+        
+        PEDIDO #{pedido.id}
+        Fecha: {pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M')}
+        Estado: {pedido.get_estado_pedido_display()}
+        Total: ${pedido.total_pedido:,.0f}
+        
+        CLIENTE:
+        Nombre: {pedido.nombre_cliente}
+        Email: {pedido.correo_cliente}
+        Teléfono: {pedido.telefono_cliente}
+        
+        DIRECCIÓN DE ENVÍO:
+        {pedido.direccion}
+        {pedido.comuna}, {pedido.region}
+        {f'Referencia: {pedido.referencia_direccion}' if pedido.referencia_direccion else ''}
+        
+        PRODUCTOS:
+        """
+        
+        for detalle in detalles:
+            mensaje += f"\n- {detalle.cantidad} x {detalle.producto.nombre} - ${detalle.precio_compra:,.0f}"
+        
+        # Construir URL del admin de forma segura
+        site_url = getattr(settings, 'SITE_URL', '')
+        if site_url:
+            mensaje += f"""
+        
+        Para gestionar este pedido, ingresa al panel de administración:
+        {site_url}/admin/miapp/pedido/{pedido.id}/
+        """
+        
         send_mail(
             asunto,
             mensaje,
             settings.DEFAULT_FROM_EMAIL,
             ['ventas.tresenuno@gmail.com'],
-            fail_silently=False,
+            fail_silently=True,  # No lanzar excepción si falla
         )
+        
+        logger.info(f"Correo de notificación enviado al admin para pedido #{pedido.id}")
         return True
+        
     except Exception as e:
-        print(f"Error al enviar correo al admin: {e}")
+        logger.error(f"Error al enviar correo al admin para pedido #{pedido.id}: {str(e)}")
         return False
 
 
@@ -734,90 +749,134 @@ def enviar_correo_admin_nuevo_pedido(pedido):
 class CheckoutAPIView(APIView):
     """
     POST /api/checkout - Procesar el checkout y crear el pedido
+    Permite checkout tanto para usuarios autenticados como invitados
     """
     
-    @transaction.atomic
     def post(self, request):
         """Procesa el checkout y crea el pedido"""
         
-        # Validar datos del formulario
-        serializer = CheckoutSerializer(data=request.data)
-        
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Obtener el carrito
-        carrito = obtener_carrito(request)
-        
-        if not carrito.get('items') or len(carrito['items']) == 0:
+        try:
+            # Log de inicio para debugging
+            logger.info("=== INICIO CHECKOUT ===")
+            logger.info(f"Session keys: {list(request.session.keys())}")
+            
+            # Validar datos del formulario
+            serializer = CheckoutSerializer(data=request.data)
+            
+            if not serializer.is_valid():
+                logger.error(f"Errores de validación: {serializer.errors}")
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Obtener el carrito
+            carrito = obtener_carrito(request)
+            
+            if not carrito.get('items') or len(carrito['items']) == 0:
+                logger.error("Carrito vacío")
+                return Response({
+                    'error': 'El carrito está vacío'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Calcular carrito completo
+            carrito_completo = calcular_carrito_completo(carrito)
+            logger.info(f"Items en carrito: {len(carrito_completo['items'])}, Total: {carrito_completo['total']}")
+            
+            # Obtener datos del pedido validados
+            datos_pedido = serializer.validated_data
+            
+            # Obtener cliente si está autenticado (puede ser None para invitados)
+            cliente_id = request.session.get('cliente_id')
+            cliente = None
+            
+            if cliente_id:
+                try:
+                    cliente = Cliente.objects.get(id=cliente_id)
+                    logger.info(f"Cliente autenticado: {cliente.correo}")
+                except Cliente.DoesNotExist:
+                    logger.warning(f"Cliente ID {cliente_id} no encontrado en BD")
+            else:
+                logger.info("Checkout como invitado")
+            
+            # Crear el pedido dentro de una transacción
+            with transaction.atomic():
+                # Crear el pedido
+                pedido = Pedido.objects.create(
+                    usuario=cliente,  # Puede ser None para invitados
+                    nombre_cliente=datos_pedido['nombre_cliente'],
+                    correo_cliente=datos_pedido['correo_cliente'],
+                    telefono_cliente=datos_pedido['telefono_cliente'],
+                    direccion=datos_pedido['direccion'],
+                    region=datos_pedido['region'],
+                    comuna=datos_pedido['comuna'],
+                    codigo_postal=datos_pedido.get('codigo_postal', ''),
+                    referencia_direccion=datos_pedido.get('referencia_direccion', ''),
+                    notas_pedido=datos_pedido.get('notas_pedido', ''),
+                    metodo_pago=datos_pedido.get('metodo_pago', 'transferencia'),
+                    total_pedido=carrito_completo['total'],
+                    estado_pedido='pendiente_pago'
+                )
+                
+                logger.info(f"Pedido creado: #{pedido.id}")
+                
+                # Crear detalles del pedido y descontar stock
+                for item in carrito_completo['items']:
+                    try:
+                        producto = Producto.objects.select_for_update().get(pk=item['producto_id'])
+                        
+                        # Verificar stock nuevamente (por si cambió)
+                        if producto.stock_disponible < item['cantidad']:
+                            logger.error(f"Stock insuficiente para {producto.nombre}")
+                            raise ValueError(f'Stock insuficiente para {producto.nombre}')
+                        
+                        # Crear detalle
+                        DetallePedido.objects.create(
+                            pedido=pedido,
+                            producto=producto,
+                            cantidad=item['cantidad'],
+                            precio_compra=item['precio_unitario']
+                        )
+                        
+                        # Descontar stock
+                        producto.reducir_stock(item['cantidad'])
+                        logger.info(f"Stock actualizado para {producto.nombre}: {producto.stock_disponible}")
+                        
+                    except Producto.DoesNotExist:
+                        logger.error(f"Producto {item['producto_id']} no encontrado")
+                        raise ValueError(f"Producto no encontrado: {item['nombre']}")
+                
+                # Si llegamos aquí, todo OK - commit implícito al salir del with
+                logger.info(f"Transacción completada para pedido #{pedido.id}")
+            
+            # FUERA de la transacción: limpiar carrito y enviar correos
+            limpiar_carrito_actual(request)
+            logger.info("Carrito limpiado")
+            
+            # Enviar correos (no afectan la transacción)
+            enviar_correo_confirmacion_pedido(pedido)
+            enviar_correo_admin_nuevo_pedido(pedido)
+            
+            # Serializar el pedido para la respuesta
+            pedido_serializer = PedidoSerializer(pedido, context={'request': request})
+            
+            logger.info(f"=== CHECKOUT EXITOSO: Pedido #{pedido.id} ===")
+            
             return Response({
-                'error': 'El carrito está vacío'
+                'message': 'Pedido creado exitosamente',
+                'pedido': pedido_serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        except ValueError as ve:
+            # Errores de validación de negocio (stock, etc)
+            logger.error(f"Error de validación: {str(ve)}")
+            return Response({
+                'error': str(ve)
             }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Calcular carrito completo
-        carrito_completo = calcular_carrito_completo(carrito)
-        
-        # Crear el pedido
-        datos_pedido = serializer.validated_data
-        
-        # ====== CORREGIDO: Obtener cliente desde la sesión ======
-        cliente_id = request.session.get('cliente_id')
-        cliente = None
-        if cliente_id:
-            try:
-                cliente = Cliente.objects.get(id=cliente_id)
-            except Cliente.DoesNotExist:
-                pass
-        # =========================================================
-        
-        pedido = Pedido.objects.create(
-            usuario=cliente,  # ← CAMBIO: Usar el cliente de la sesión
-            nombre_cliente=datos_pedido['nombre_cliente'],
-            correo_cliente=datos_pedido['correo_cliente'],
-            telefono_cliente=datos_pedido['telefono_cliente'],
-            direccion=datos_pedido['direccion'],
-            region=datos_pedido['region'],
-            comuna=datos_pedido['comuna'],
-            codigo_postal=datos_pedido.get('codigo_postal', ''),
-            referencia_direccion=datos_pedido.get('referencia_direccion', ''),
-            notas_pedido=datos_pedido.get('notas_pedido', ''),
-            metodo_pago=datos_pedido.get('metodo_pago', 'transferencia'),
-            total_pedido=carrito_completo['total'],
-            estado_pedido='pendiente_pago'
-        )
-        
-        # Crear detalles del pedido y descontar stock
-        for item in carrito_completo['items']:
-            producto = Producto.objects.get(pk=item['producto_id'])
             
-            # Verificar stock nuevamente
-            if producto.stock_disponible < item['cantidad']:
-                raise Exception(f'Stock insuficiente para {producto.nombre}')
-            
-            DetallePedido.objects.create(
-                pedido=pedido,
-                producto=producto,
-                cantidad=item['cantidad'],
-                precio_compra=item['precio_unitario']
-            )
-            
-            # Descontar stock usando el método del modelo
-            producto.reducir_stock(item['cantidad'])
-        
-        # Limpiar el carrito
-        limpiar_carrito_actual(request)
-        
-        # Enviar correos
-        enviar_correo_confirmacion_pedido(pedido)
-        enviar_correo_admin_nuevo_pedido(pedido)
-        
-        # Serializar el pedido para la respuesta
-        pedido_serializer = PedidoSerializer(pedido, context={'request': request})
-        
-        return Response({
-            'message': 'Pedido creado exitosamente',
-            'pedido': pedido_serializer.data
-        }, status=status.HTTP_201_CREATED)
+        except Exception as e:
+            # Cualquier otro error inesperado
+            logger.error(f"Error inesperado en checkout: {str(e)}", exc_info=True)
+            return Response({
+                'error': 'Error al procesar el pedido. Por favor, intenta nuevamente o contacta con soporte.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class MisPedidosAPIView(generics.ListAPIView):
@@ -932,7 +991,6 @@ class CategoriaListAPIView(generics.ListAPIView):
     def get_queryset(self):
         """Retorna solo categorías activas con productos"""
         queryset = super().get_queryset()
-
         return queryset
 
 @staff_member_required
