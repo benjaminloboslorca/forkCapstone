@@ -1,1 +1,1 @@
-web: python manage.py collectstatic --noinput && python manage.py migrate && gunicorn tres_en_uno.wsgi --log-file -
+web: python manage.py collectstatic --noinput && python manage.py migrate && gunicorn tres_en_uno.wsgi --bind 0.0.0.0:$PORT --workers 4 --timeout 120
