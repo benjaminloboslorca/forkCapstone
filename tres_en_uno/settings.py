@@ -77,19 +77,13 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': False,
+        'APP_DIRS': True,  # CAMBIADO A TRUE - Necesario para que busque templates en las apps
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-            ],
-            'loaders': [
-                ('django.template.loaders.cached.Loader', [
-                    'django.template.loaders.filesystem.Loader',
-                    'django.template.loaders.app_directories.Loader',
-                ]),
             ],
         },
     },
@@ -146,24 +140,29 @@ USE_I18N = True
 USE_TZ = True
 
 # ==============================================================================
-# STATIC FILES
-# ==============================================================================
-
-# ==============================================================================
-# STATIC FILES
+# STATIC FILES - CORREGIDO
 # ==============================================================================
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Django buscará automáticamente en miapp/static/
+# Directorios adicionales donde buscar archivos estáticos
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # AGREGADO - Carpeta static en la raíz del proyecto
+]
+
+# Django buscará automáticamente en miapp/static/ gracias a AppDirectoriesFinder
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
 # Whitenoise para servir archivos estáticos en producción
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Si tienes problemas en desarrollo, puedes usar esta versión:
+if DEBUG:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+else:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ==============================================================================
 # MEDIA FILES - Cloudinary en producción, local en desarrollo
@@ -255,11 +254,11 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_CACHE_ALIAS = 'default'
 
 # ==============================================================================
-# SECURITY SETTINGS - OPTIMIZADO PARA RAILWAY
+# SECURITY SETTINGS - OPTIMIZADO PARA RAILWAY Y FUNCIONALIDAD
 # ==============================================================================
 
-# CSRF Protection
-CSRF_COOKIE_HTTPONLY = False  # False para que el admin funcione
+# CSRF Protection - Ajustado para que el admin funcione
+CSRF_COOKIE_HTTPONLY = False  # False para que JavaScript pueda acceder (necesario para algunos casos)
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_SECURE = not DEBUG
@@ -270,10 +269,16 @@ if not DEBUG:
         'https://www.tresenunocultivos.cl',
         'https://*.railway.app',
     ]
+else:
+    # En desarrollo, permitir localhost
+    CSRF_TRUSTED_ORIGINS = [
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+    ]
 
 # Session Security
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'  # Lax para compatibilidad
+SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_AGE = 3600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_SAVE_EVERY_REQUEST = True
@@ -282,11 +287,11 @@ SESSION_COOKIE_SECURE = not DEBUG
 # XSS Protection
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'SAMEORIGIN'  # Cambiar a SAMEORIGIN para el admin
+X_FRAME_OPTIONS = 'SAMEORIGIN'  # SAMEORIGIN permite que el admin funcione
 
-# HTTPS/SSL - Railway maneja HTTPS
+# HTTPS/SSL - Solo en producción
 if not DEBUG:
-    SECURE_SSL_REDIRECT = False
+    SECURE_SSL_REDIRECT = False  # Railway maneja esto
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
