@@ -149,13 +149,20 @@ USE_TZ = True
 # STATIC FILES
 # ==============================================================================
 
+# ==============================================================================
+# STATIC FILES
+# ==============================================================================
+
 STATIC_URL = '/static/'
-STATICFILES_DIRS = []
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Django buscará automáticamente en miapp/static/
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
+
+# Whitenoise para servir archivos estáticos en producción
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ==============================================================================
