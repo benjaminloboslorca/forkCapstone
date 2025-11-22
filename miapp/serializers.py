@@ -1,7 +1,9 @@
 from rest_framework import serializers
 from rest_framework import exceptions 
 from .models import Cliente, Producto, Categoria, Oferta, Pedido, DetallePedido
-from django.utils import timezone  
+from django.utils import timezone
+from django.templatetags.static import static
+
 
 class ClienteRegistroSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
@@ -198,13 +200,31 @@ class ProductoSerializer(serializers.ModelSerializer):
         }
     
     def get_imagen_url(self, obj):
-        """Retorna la URL completa de la imagen"""
-        if obj.imagen:
+        """
+        Retorna la URL completa de la imagen usando static()
+        CORREGIDO: Ahora usa static() en vez de .url
+        """
+        try:
+            if obj.imagen:
+                # Construir URL usando static()
+                imagen_url = static(f'img/productos/{obj.imagen}')
+                
+                # Si tenemos request, construir URL absoluta
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(imagen_url)
+                
+                return imagen_url
+            
+            # Si no tiene imagen, devolver default
+            default_url = static('img/productos/default.jpg')
             request = self.context.get('request')
             if request:
-                return request.build_absolute_uri(obj.imagen.url)
-            return obj.imagen.url
-        return None
+                return request.build_absolute_uri(default_url)
+            return default_url
+            
+        except Exception as e:
+            return None
     
     def get_ofertas_activas(self, obj):
         """Obtiene las ofertas activas del producto"""
@@ -261,13 +281,31 @@ class ProductoListSerializer(serializers.ModelSerializer):
         ]
     
     def get_imagen_url(self, obj):
-        """Retorna la URL de la imagen principal"""
-        if obj.imagen:
+        """
+        Retorna la URL de la imagen usando static()
+        CORREGIDO: Ahora usa static() en vez de .url
+        """
+        try:
+            if obj.imagen:
+                # Construir URL usando static()
+                imagen_url = static(f'img/productos/{obj.imagen}')
+                
+                # Si tenemos request, construir URL absoluta
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(imagen_url)
+                
+                return imagen_url
+            
+            # Si no tiene imagen, devolver default
+            default_url = static('img/productos/default.jpg')
             request = self.context.get('request')
             if request:
-                return request.build_absolute_uri(obj.imagen.url)
-            return obj.imagen.url
-        return None
+                return request.build_absolute_uri(default_url)
+            return default_url
+            
+        except Exception as e:
+            return None
     
     def get_precio_final(self, obj):
         """Calcula el precio final (con oferta si existe)"""
@@ -409,13 +447,31 @@ class DetallePedidoSerializer(serializers.ModelSerializer):
         fields = ['id', 'cantidad', 'precio_compra', 'producto_nombre', 'producto_imagen', 'subtotal']
     
     def get_producto_imagen(self, obj):
-        """Obtiene la URL de la imagen del producto"""
-        if obj.producto.imagen:
+        """
+        Obtiene la URL de la imagen del producto usando static()
+        CORREGIDO: Ahora usa static() en vez de .url
+        """
+        try:
+            if obj.producto.imagen:
+                # Construir URL usando static()
+                imagen_url = static(f'img/productos/{obj.producto.imagen}')
+                
+                # Si tenemos request, construir URL absoluta
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(imagen_url)
+                
+                return imagen_url
+            
+            # Si no tiene imagen, devolver default
+            default_url = static('img/productos/default.jpg')
             request = self.context.get('request')
             if request:
-                return request.build_absolute_uri(obj.producto.imagen.url)
-            return obj.producto.imagen.url
-        return None
+                return request.build_absolute_uri(default_url)
+            return default_url
+            
+        except Exception as e:
+            return None
 
 
 class PedidoSerializer(serializers.ModelSerializer):
