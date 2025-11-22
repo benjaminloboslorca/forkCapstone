@@ -77,7 +77,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,  # CAMBIADO A TRUE - Necesario para que busque templates en las apps
+        'APP_DIRS': True,  # Permite buscar templates en miapp/templates/
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -140,25 +140,21 @@ USE_I18N = True
 USE_TZ = True
 
 # ==============================================================================
-# STATIC FILES - CORREGIDO
+# STATIC FILES - CONFIGURACIÓN CORRECTA PARA TU ESTRUCTURA
 # ==============================================================================
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Directorios adicionales donde buscar archivos estáticos
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # AGREGADO - Carpeta static en la raíz del proyecto
-]
+# NO necesitas STATICFILES_DIRS porque tus archivos están en miapp/static/
+# Django los encuentra automáticamente con AppDirectoriesFinder
 
-# Django buscará automáticamente en miapp/static/ gracias a AppDirectoriesFinder
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',  # Encuentra miapp/static/
 ]
 
-# Whitenoise para servir archivos estáticos en producción
-# Si tienes problemas en desarrollo, puedes usar esta versión:
+# En desarrollo, NO usar WhiteNoise con manifest para evitar problemas
 if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 else:
@@ -257,8 +253,8 @@ SESSION_CACHE_ALIAS = 'default'
 # SECURITY SETTINGS - OPTIMIZADO PARA RAILWAY Y FUNCIONALIDAD
 # ==============================================================================
 
-# CSRF Protection - Ajustado para que el admin funcione
-CSRF_COOKIE_HTTPONLY = False  # False para que JavaScript pueda acceder (necesario para algunos casos)
+# CSRF Protection
+CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
 CSRF_COOKIE_SECURE = not DEBUG
@@ -270,7 +266,6 @@ if not DEBUG:
         'https://*.railway.app',
     ]
 else:
-    # En desarrollo, permitir localhost
     CSRF_TRUSTED_ORIGINS = [
         'http://localhost:8000',
         'http://127.0.0.1:8000',
@@ -287,11 +282,11 @@ SESSION_COOKIE_SECURE = not DEBUG
 # XSS Protection
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'SAMEORIGIN'  # SAMEORIGIN permite que el admin funcione
+X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 # HTTPS/SSL - Solo en producción
 if not DEBUG:
-    SECURE_SSL_REDIRECT = False  # Railway maneja esto
+    SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
