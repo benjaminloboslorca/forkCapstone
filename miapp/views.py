@@ -401,7 +401,7 @@ def calcular_carrito_completo(carrito):
             
             imagen_url = None
             if producto.imagen:
-                imagen_url = producto.imagen.url
+                imagen_url = producto.get_imagen_url()
             
             item = {
                 'producto_id': producto.id,

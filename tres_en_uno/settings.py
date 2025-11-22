@@ -157,12 +157,11 @@ STATICFILES_FINDERS = [
 # WhiteNoise configuración
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = DEBUG
-WHITENOISE_MANIFEST_STRICT = False  # No fallar si falta algún archivo
+WHITENOISE_MANIFEST_STRICT = False  
 
 if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 else:
-    # Usar CompressedStaticFilesStorage (sin Manifest que da problemas)
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 # ==============================================================================
