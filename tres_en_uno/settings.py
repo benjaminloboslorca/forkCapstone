@@ -58,6 +58,8 @@ INSTALLED_APPS = [
     'miapp',
     'rest_framework',
     'rest_framework_simplejwt',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 MIDDLEWARE = [
@@ -105,18 +107,19 @@ WSGI_APPLICATION = 'tres_en_uno.wsgi.application'
 # DATABASE - Configuración dual (Local y Railway)
 # ==============================================================================
 
-if 'DATABASE_URL' in os.environ:
-    # PRODUCCIÓN (Railway) - Usa DATABASE_URL
+# Intentar obtener DATABASE_URL desde .env o variables de entorno
+DATABASE_URL = config('DATABASE_URL', default=None)
+
+if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.config(
-            default=os.environ.get('DATABASE_URL'),
+            default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
             ssl_require=True
         )
     }
 else:
-    # DESARROLLO (Local) - Usa variables del .env
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -184,8 +187,24 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # MEDIA FILES (Archivos subidos por usuarios)
 # ==============================================================================
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# MEDIA FILES (Archivos subidos por usuarios)
+if not DEBUG:
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    
+    cloudinary.config(
+        cloud_name=config('CLOUDINARY_CLOUD_NAME'),
+        api_key=config('CLOUDINARY_API_KEY'),
+        api_secret=config('CLOUDINARY_API_SECRET'),
+        secure=True
+    )
+    
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+else:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 # Límites de archivos subidos
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5 MB
