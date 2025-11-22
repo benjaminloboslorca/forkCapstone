@@ -183,13 +183,11 @@ class Producto(models.Model):
     )
     
     # Imagen simplificada (sin modelo separado)
-    imagen = models.ImageField(
-        upload_to='productos/',  # Guarda directamente en productos/
-        null=True,
-        blank=True,
-        verbose_name="Imagen del producto",
-        help_text="Imagen principal del producto"
-    )
+    imagen = models.CharField(max_length=255, default='default.jpg')
+
+    def get_imagen_url(self):
+        from django.templatetags.static import static
+        return static(f'img/productos/{self.imagen}')
     
     # Campos de auditoría
     activo = models.BooleanField(
