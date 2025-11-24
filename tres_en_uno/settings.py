@@ -1,6 +1,6 @@
 """
 Django settings for tres_en_uno project.
-VERSIÓN CORREGIDA PARA PRODUCCIÓN CON RESEND API
+VERSIÓN CORREGIDA PARA PRODUCCIÓN
 """
 
 import os
@@ -109,29 +109,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'tres_en_uno.wsgi.application'
 
 # ==============================================================================
-# DATABASE - CORREGIDO PARA RAILWAY
+# DATABASE
 # ==============================================================================
 
-DATABASE_URL_CONFIG = config('DATABASE_URL', default=None)
+DATABASE_URL = config('DATABASE_URL', default=None)
 
-if DATABASE_URL_CONFIG:
-    # Producción (Railway) - usar DATABASE_URL
+if DATABASE_URL:
+    # Usar la DATABASE_URL directamente (Railway, Heroku, etc.)
     DATABASES = {
         'default': dj_database_url.config(
-            default=DATABASE_URL_CONFIG,
+            default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=False
+            ssl_require=False  # Railway no requiere SSL explícito
         )
     }
 else:
-    # Desarrollo local - usar variables individuales
+    # Fallback a configuración manual
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': config('DB_NAME', default='tresenuno_db'),
             'USER': config('DB_USER', default='postgres'),
-            'PASSWORD': config('DB_PASSWORD', default=''),
+            'PASSWORD': config('DB_PASSWORD'),
             'HOST': config('DB_HOST', default='localhost'),
             'PORT': config('DB_PORT', default='5432'),
             'CONN_MAX_AGE': 600,
@@ -243,12 +243,16 @@ SIMPLE_JWT = {
 }
 
 # ==============================================================================
-# EMAIL CONFIGURATION - SIMPLIFICADO PARA RESEND API
+# EMAIL CONFIGURATION (SIN VALORES POR DEFECTO - USA .env)
 # ==============================================================================
 
-# Estas variables son solo para la API de Resend, no para SMTP
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')  # API key de Resend
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='onboarding@resend.dev')
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
 
 # ==============================================================================
 # SITE CONFIGURATION
@@ -302,6 +306,11 @@ if not DEBUG:
     # HTTPS
     SECURE_SSL_REDIRECT = False  # Railway maneja el redirect
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    
+    # HSTS - Descomentar después de verificar que HTTPS funciona bien
+    # SECURE_HSTS_SECONDS = 31536000  # 1 año
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    # SECURE_HSTS_PRELOAD = True
     
     # Otras configuraciones de seguridad
     SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -385,7 +394,7 @@ LOGGING = {
 # ==============================================================================
 
 ADMINS = [
-    ('Admin Tres en Uno', 'ventas.tresenuno@gmail.com'),
+    ('Admin Tres en Uno', config('ADMIN_EMAIL', default='ventas.tresenuno@gmail.com')),
 ]
 
 MANAGERS = ADMINS
@@ -401,15 +410,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ==============================================================================
 
 if DEBUG:
+    # En desarrollo, permitir emails en consola si no está configurado
+    if not config('EMAIL_HOST_PASSWORD', default=''):
+        EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+        print("⚠️  EMAIL: Usando console backend (desarrollo)")
+    
     # Logging más verboso en desarrollo
     LOGGING['root']['level'] = 'DEBUG'
     LOGGING['loggers']['miapp']['level'] = 'DEBUG'
-```
-
----
-
-## 🔧 TAMBIÉN CORRIGE TU SECRET_KEY EN RAILWAY
-
-Tu SECRET_KEY está truncada. En Railway, cámbiala a:
-```
-SECRET_KEY=)=3*xi*h!x*43@x&xzxw=ugmv3#!bf9ck&e&hq$$pb^47t3c(x
