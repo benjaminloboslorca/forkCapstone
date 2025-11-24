@@ -55,6 +55,7 @@ from django.contrib.auth.forms import PasswordResetForm
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
+
 from django.contrib.sites.shortcuts import get_current_site
 
 # Configurar logging
@@ -1278,15 +1279,16 @@ class CustomPasswordResetView(APIView):
     """
     
     def get(self, request):
-        """Renderiza el formulario"""
+        """Renderiza el formulario personalizado"""
         from django.shortcuts import render
-        return render(request, 'registration/password_reset_form.html', {'form': PasswordResetForm()})
+        form = PasswordResetForm()
+        return render(request, 'miapp/registro/password_reset_form.html', {'form': form})
     
     def post(self, request):
         """Procesa el formulario y envía el correo"""
         from django.shortcuts import render, redirect
         
-        form = PasswordResetForm(request.data or request.POST)
+        form = PasswordResetForm(request.POST)
         
         if form.is_valid():
             email = form.cleaned_data['email']
@@ -1300,15 +1302,18 @@ class CustomPasswordResetView(APIView):
                     token = default_token_generator.make_token(usuario)
                     uid = urlsafe_base64_encode(force_bytes(usuario.pk))
                     
-                    # Construir URL
-                    current_site = get_current_site(request)
-                    protocol = 'https' if request.is_secure() else 'http'
-                    reset_url = f"{protocol}://{current_site.domain}/auth/olvide-contrasena/confirmar/{uid}/{token}/"
+                    # Construir URL de reset
+                    protocol = 'https' if not settings.DEBUG else 'http'
+                    domain = request.get_host()
+                    reset_url = f"{protocol}://{domain}/auth/olvide-contrasena/confirmar/{uid}/{token}/"
                     
-                    # Enviar correo
+                    # Enviar correo con Resend
                     enviar_correo_password_reset(email, reset_url)
+                    
+                    logger.info(f"Correo de reset enviado a {email}")
             
-            # Siempre redirigir a "done" (por seguridad, no revelar si el email existe)
+            # Siempre redirigir a "done" (por seguridad)
             return redirect('password_reset_done')
         
-        return render(request, 'registration/password_reset_form.html', {'form': form})
+        # Si hay errores, volver a mostrar el formulario
+        return render(request, 'miapp/registro/password_reset_form.html', {'form': form})
