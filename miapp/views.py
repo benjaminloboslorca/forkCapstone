@@ -646,7 +646,7 @@ def enviar_correo_confirmacion_pedido(pedido):
         """
         
         params = {
-            "from": "Tres en Uno <onboarding@resend.dev>",
+            "from": f"Tres en Uno <{settings.DEFAULT_FROM_EMAIL}>",
             "to": [pedido.correo_cliente],
             "subject": f"Pedido #{pedido.id} - Confirmación y Datos de Pago",
             "html": mensaje_html,
@@ -695,7 +695,7 @@ def enviar_correo_admin_nuevo_pedido(pedido):
         """
         
         params = {
-            "from": "Tres en Uno <onboarding@resend.dev>",
+            "from": f"Tres en Uno <{settings.DEFAULT_FROM_EMAIL}>",
             "to": ["ventas.tresenuno@gmail.com"],
             "subject": f"🛒 Nuevo Pedido #{pedido.id} - {pedido.nombre_cliente}",
             "text": mensaje,
