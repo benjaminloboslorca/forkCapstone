@@ -1,6 +1,6 @@
 """
 Django settings for tres_en_uno project.
-VERSIÓN CORREGIDA PARA PRODUCCIÓN
+VERSIÓN CORREGIDA PARA PRODUCCIÓN CON RESEND API
 """
 
 import os
@@ -109,29 +109,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'tres_en_uno.wsgi.application'
 
 # ==============================================================================
-# DATABASE
+# DATABASE - CORREGIDO PARA RAILWAY
 # ==============================================================================
 
-DATABASE_URL = config('DATABASE_URL', default=None)
+DATABASE_URL_CONFIG = config('DATABASE_URL', default=None)
 
-if DATABASE_URL:
-    # Usar la DATABASE_URL directamente (Railway, Heroku, etc.)
+if DATABASE_URL_CONFIG:
+    # Producción (Railway) - usar DATABASE_URL
     DATABASES = {
         'default': dj_database_url.config(
-            default=DATABASE_URL,
+            default=DATABASE_URL_CONFIG,
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=False  # Railway no requiere SSL explícito
+            ssl_require=False
         )
     }
 else:
-    # Fallback a configuración manual
+    # Desarrollo local - usar variables individuales
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': config('DB_NAME', default='tresenuno_db'),
             'USER': config('DB_USER', default='postgres'),
-            'PASSWORD': config('DB_PASSWORD'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
             'HOST': config('DB_HOST', default='localhost'),
             'PORT': config('DB_PORT', default='5432'),
             'CONN_MAX_AGE': 600,
@@ -243,16 +243,12 @@ SIMPLE_JWT = {
 }
 
 # ==============================================================================
-# EMAIL CONFIGURATION (SIN VALORES POR DEFECTO - USA .env)
+# EMAIL CONFIGURATION - SOLO PARA RESEND API
 # ==============================================================================
 
-EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default=EMAIL_HOST_USER)
+# Solo necesitamos estas variables para usar la API de Resend en views.py
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')  # API key de Resend
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='onboarding@resend.dev')
 
 # ==============================================================================
 # SITE CONFIGURATION
@@ -306,11 +302,6 @@ if not DEBUG:
     # HTTPS
     SECURE_SSL_REDIRECT = False  # Railway maneja el redirect
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    
-    # HSTS - Descomentar después de verificar que HTTPS funciona bien
-    # SECURE_HSTS_SECONDS = 31536000  # 1 año
-    # SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    # SECURE_HSTS_PRELOAD = True
     
     # Otras configuraciones de seguridad
     SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -394,7 +385,7 @@ LOGGING = {
 # ==============================================================================
 
 ADMINS = [
-    ('Admin Tres en Uno', config('ADMIN_EMAIL', default='ventas.tresenuno@gmail.com')),
+    ('Admin Tres en Uno', 'ventas.tresenuno@gmail.com'),
 ]
 
 MANAGERS = ADMINS
@@ -410,11 +401,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ==============================================================================
 
 if DEBUG:
-    # En desarrollo, permitir emails en consola si no está configurado
-    if not config('EMAIL_HOST_PASSWORD', default=''):
-        EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-        print("⚠️  EMAIL: Usando console backend (desarrollo)")
-    
     # Logging más verboso en desarrollo
     LOGGING['root']['level'] = 'DEBUG'
     LOGGING['loggers']['miapp']['level'] = 'DEBUG'
