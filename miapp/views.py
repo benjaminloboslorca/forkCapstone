@@ -594,24 +594,21 @@ def ver_carrito(request):
 def enviar_correo_confirmacion_pedido(pedido):
     """
     Envía correo de confirmación al cliente con instrucciones de pago
-    NOTA: Esta función NO lanza excepciones para evitar rollback de transacciones
+    Usa Resend API (HTTP) en lugar de SMTP
     """
     try:
-        asunto = f'Pedido #{pedido.id} - Confirmación y Datos de Pago'
+        import resend
+        from django.conf import settings
+        
+        # Configurar API key de Resend
+        resend.api_key = settings.EMAIL_HOST_PASSWORD  # Usamos esta variable para la API key
         
         detalles = pedido.detalles.all()
         
-        # Contexto para el template
-        contexto = {
-            'pedido': pedido,
-            'detalles': detalles,
-            'banco': 'Banco Estado',
-            'tipo_cuenta': 'Cuenta Vista',
-            'numero_cuenta': '90272246717',
-            'rut': '77.851.212-2',
-            'titular': 'Tres en uno',
-            'correo_contacto': 'ventas.tresenuno@gmail.com',
-        }
+        # Construir lista de productos
+        productos_html = ""
+        for detalle in detalles:
+            productos_html += f"<li>{detalle.cantidad} x {detalle.producto.nombre} - ${detalle.precio_compra:,.0f}</li>"
         
         mensaje_html = f"""
         <html>
@@ -620,28 +617,19 @@ def enviar_correo_confirmacion_pedido(pedido):
                 
                 <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
                     <h3>Pedido #{pedido.id}</h3>
-                    <p><strong>Fecha:</strong> {localtime(pedido.fecha_pedido).strftime('%d/%m/%Y %H:%M')}</p>
                     <p><strong>Total:</strong> ${pedido.total_pedido:,.0f}</p>
-                    <p><strong>Estado:</strong> {pedido.get_estado_pedido_display()}</p>
                 </div>
                 
                 <h3>Productos:</h3>
-                <ul>
-        """
-        
-        for detalle in detalles:
-            mensaje_html += f"<li>{detalle.cantidad} x {detalle.producto.nombre} - ${detalle.precio_compra:,.0f}</li>"
-        
-        mensaje_html += f"""
-                </ul>
+                <ul>{productos_html}</ul>
                 
                 <div style="background: #fff3cd; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;">
                     <h3 style="margin-top: 0;">💳 Datos para Transferencia</h3>
-                    <p><strong>Banco:</strong> {contexto['banco']}</p>
-                    <p><strong>Tipo de Cuenta:</strong> {contexto['tipo_cuenta']}</p>
-                    <p><strong>Número de Cuenta:</strong> {contexto['numero_cuenta']}</p>
-                    <p><strong>RUT:</strong> {contexto['rut']}</p>
-                    <p><strong>Titular:</strong> {contexto['titular']}</p>
+                    <p><strong>Banco:</strong> Banco Estado</p>
+                    <p><strong>Tipo de Cuenta:</strong> Cuenta Vista</p>
+                    <p><strong>Número de Cuenta:</strong> 90272246717</p>
+                    <p><strong>RUT:</strong> 77.851.212-2</p>
+                    <p><strong>Titular:</strong> Tres en uno</p>
                     <p><strong>Monto a transferir:</strong> ${pedido.total_pedido:,.0f}</p>
                     <p style="color: #856404;"><strong>⚠️ Importante:</strong> Incluye el número de pedido #{pedido.id} en el mensaje de la transferencia.</p>
                 </div>
@@ -650,57 +638,47 @@ def enviar_correo_confirmacion_pedido(pedido):
                     <h3 style="margin-top: 0;">📦 Dirección de Envío</h3>
                     <p>{pedido.direccion}</p>
                     <p>{pedido.comuna}, {pedido.region}</p>
-                    {f'<p><strong>Referencia:</strong> {pedido.referencia_direccion}</p>' if pedido.referencia_direccion else ''}
                 </div>
                 
-                <p>Una vez confirmado el pago, procesaremos tu pedido y te enviaremos la información de seguimiento.</p>
-                
-                <p>Si tienes alguna duda, contáctanos a: <a href="mailto:{contexto['correo_contacto']}">{contexto['correo_contacto']}</a></p>
-                
-                <hr style="margin: 30px 0;">
-                <p style="color: #6c757d; font-size: 12px;">
-                    Tres En Uno - Cultivos Orgánicos<br>
-                    Este es un correo automático, por favor no respondas a este mensaje.
-                </p>
+                <p>Si tienes alguna duda, contáctanos a: ventas.tresenuno@gmail.com</p>
             </body>
         </html>
         """
         
-        mensaje_texto = strip_tags(mensaje_html)
+        params = {
+            "from": "Tres en Uno <onboarding@resend.dev>",
+            "to": [pedido.correo_cliente],
+            "subject": f"Pedido #{pedido.id} - Confirmación y Datos de Pago",
+            "html": mensaje_html,
+        }
         
-        email = EmailMultiAlternatives(
-            asunto,
-            mensaje_texto,
-            settings.DEFAULT_FROM_EMAIL,
-            [pedido.correo_cliente]
-        )
-        email.attach_alternative(mensaje_html, "text/html")
-        email.send(fail_silently=True)  # No lanzar excepción si falla
-        
+        resend.Emails.send(params)
         logger.info(f"Correo de confirmación enviado para pedido #{pedido.id}")
         return True
         
     except Exception as e:
-        logger.error(f"Error al enviar correo de confirmación para pedido #{pedido.id}: {str(e)}")
+        logger.error(f"Error al enviar correo: {str(e)}")
         return False
 
 
 def enviar_correo_admin_nuevo_pedido(pedido):
     """
     Notifica al administrador sobre un nuevo pedido
-    NOTA: Esta función NO lanza excepciones para evitar rollback de transacciones
+    Usa Resend API (HTTP)
     """
     try:
-        asunto = f'🛒 Nuevo Pedido #{pedido.id} - {pedido.nombre_cliente}'
+        import resend
+        from django.conf import settings
+        
+        resend.api_key = settings.EMAIL_HOST_PASSWORD
         
         detalles = pedido.detalles.all()
+        productos_texto = "\n".join([f"- {d.cantidad} x {d.producto.nombre} - ${d.precio_compra:,.0f}" for d in detalles])
         
         mensaje = f"""
-        Se ha recibido un nuevo pedido en Tres En Uno.
+        Nuevo pedido en Tres En Uno
         
         PEDIDO #{pedido.id}
-        Fecha: {pedido.fecha_pedido.strftime('%d/%m/%Y %H:%M')}
-        Estado: {pedido.get_estado_pedido_display()}
         Total: ${pedido.total_pedido:,.0f}
         
         CLIENTE:
@@ -708,39 +686,27 @@ def enviar_correo_admin_nuevo_pedido(pedido):
         Email: {pedido.correo_cliente}
         Teléfono: {pedido.telefono_cliente}
         
-        DIRECCIÓN DE ENVÍO:
+        DIRECCIÓN:
         {pedido.direccion}
         {pedido.comuna}, {pedido.region}
-        {f'Referencia: {pedido.referencia_direccion}' if pedido.referencia_direccion else ''}
         
         PRODUCTOS:
+        {productos_texto}
         """
         
-        for detalle in detalles:
-            mensaje += f"\n- {detalle.cantidad} x {detalle.producto.nombre} - ${detalle.precio_compra:,.0f}"
+        params = {
+            "from": "Tres en Uno <onboarding@resend.dev>",
+            "to": ["ventas.tresenuno@gmail.com"],
+            "subject": f"🛒 Nuevo Pedido #{pedido.id} - {pedido.nombre_cliente}",
+            "text": mensaje,
+        }
         
-        # Construir URL del admin de forma segura
-        site_url = getattr(settings, 'SITE_URL', '')
-        if site_url:
-            mensaje += f"""
-        
-        Para gestionar este pedido, ingresa al panel de administración:
-        {site_url}/admin/miapp/pedido/{pedido.id}/
-        """
-        
-        send_mail(
-            asunto,
-            mensaje,
-            settings.DEFAULT_FROM_EMAIL,
-            ['ventas.tresenuno@gmail.com'],
-            fail_silently=True,  # No lanzar excepción si falla
-        )
-        
-        logger.info(f"Correo de notificación enviado al admin para pedido #{pedido.id}")
+        resend.Emails.send(params)
+        logger.info(f"Correo admin enviado para pedido #{pedido.id}")
         return True
         
     except Exception as e:
-        logger.error(f"Error al enviar correo al admin para pedido #{pedido.id}: {str(e)}")
+        logger.error(f"Error al enviar correo admin: {str(e)}")
         return False
 
 
