@@ -51,6 +51,12 @@ from django.shortcuts import redirect
 
 from django.utils.timezone import localtime
 
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.contrib.sites.shortcuts import get_current_site
+
 # Configurar logging
 logger = logging.getLogger(__name__)
 
@@ -1201,3 +1207,108 @@ def actualizar_perfil(request):
         }, status=status.HTTP_200_OK)
     
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def enviar_correo_password_reset(email, reset_url):
+    """
+    Envía correo de recuperación de contraseña usando Resend API
+    """
+    try:
+        import resend
+        from django.conf import settings
+        
+        resend.api_key = settings.EMAIL_HOST_PASSWORD
+        
+        mensaje_html = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="color: #28a745;">Restablecer Contraseña</h2>
+                </div>
+                
+                <p>Hola,</p>
+                
+                <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta en Tres En Uno.</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{reset_url}" 
+                       style="background: #28a745; color: white; padding: 15px 30px; 
+                              text-decoration: none; border-radius: 5px; display: inline-block;
+                              font-weight: bold;">
+                        Restablecer mi contraseña
+                    </a>
+                </div>
+                
+                <p>O copia y pega este enlace en tu navegador:</p>
+                <p style="background: #f8f9fa; padding: 10px; border-radius: 5px; word-break: break-all;">
+                    {reset_url}
+                </p>
+                
+                <p style="color: #6c757d; font-size: 14px; margin-top: 30px;">
+                    Si no solicitaste este cambio, puedes ignorar este correo de forma segura.
+                </p>
+                
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #e9ecef;">
+                
+                <p style="color: #6c757d; font-size: 12px; text-align: center;">
+                    Tres En Uno - Cultivos Orgánicos<br>
+                    Este es un correo automático, por favor no respondas a este mensaje.
+                </p>
+            </body>
+        </html>
+        """
+        
+        params = {
+            "from": f"Tres en Uno <{settings.DEFAULT_FROM_EMAIL}>",
+            "to": [email],
+            "subject": "Restablecer contraseña - Tres en Uno",
+            "html": mensaje_html,
+        }
+        
+        resend.Emails.send(params)
+        logger.info(f"Correo de reset enviado a {email}")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error al enviar correo de reset: {str(e)}")
+        return False
+
+class CustomPasswordResetView(APIView):
+    """
+    Vista custom para password reset que usa Resend API
+    """
+    
+    def get(self, request):
+        """Renderiza el formulario"""
+        from django.shortcuts import render
+        return render(request, 'registration/password_reset_form.html', {'form': PasswordResetForm()})
+    
+    def post(self, request):
+        """Procesa el formulario y envía el correo"""
+        from django.shortcuts import render, redirect
+        
+        form = PasswordResetForm(request.data or request.POST)
+        
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            
+            # Buscar usuario por email
+            usuarios = Cliente.objects.filter(correo=email, is_active=True)
+            
+            if usuarios.exists():
+                for usuario in usuarios:
+                    # Generar token
+                    token = default_token_generator.make_token(usuario)
+                    uid = urlsafe_base64_encode(force_bytes(usuario.pk))
+                    
+                    # Construir URL
+                    current_site = get_current_site(request)
+                    protocol = 'https' if request.is_secure() else 'http'
+                    reset_url = f"{protocol}://{current_site.domain}/auth/olvide-contrasena/confirmar/{uid}/{token}/"
+                    
+                    # Enviar correo
+                    enviar_correo_password_reset(email, reset_url)
+            
+            # Siempre redirigir a "done" (por seguridad, no revelar si el email existe)
+            return redirect('password_reset_done')
+        
+        return render(request, 'registration/password_reset_form.html', {'form': form})
