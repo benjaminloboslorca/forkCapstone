@@ -182,12 +182,12 @@
                         {% for item in detalles_con_subtotal %}
                         <div class="producto-item">
                             {% if item.detalle.producto.imagen %}
-                                <img src="{{ item.detalle.producto.imagen.url }}" alt="{{ item.detalle.producto.nombre }}">
+                                <img src="{% static 'img/productos/' %}{{ item.detalle.producto.imagen }}" alt="{{ item.detalle.producto.nombre }}">
                             {% else %}
-                                <img src="{% static 'img/placeholder.png' %}" alt="Sin imagen">
+                                <img src="{% static 'img/default-product.jpg' %}" alt="Sin imagen">
                             {% endif %}
                             <div class="flex-grow-1">
-                                <strong>{{ item.detalle.id_producto.nombre }}</strong>
+                                <strong>{{ item.detalle.producto.nombre }}</strong>
                                 <br>
                                 <small class="text-muted">{{ item.detalle.cantidad }} x ${{ item.detalle.precio_compra|floatformat:0 }}</small>
                             </div>
