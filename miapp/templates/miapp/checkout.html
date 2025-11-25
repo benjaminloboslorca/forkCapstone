@@ -308,8 +308,8 @@
                         <div id="productos-resumen">
                             {% for item in carrito.items %}
                             <div class="producto-resumen">
-                                <img src="{{ item.imagen_url|default:'/static/img/default-product.jpg' }}" alt="{{ item.nombre }}">
-                                <div class="flex-grow-1">
+                                {% load static %}
+                                <img src="{% static 'img/productos/' %}{{ item.imagen_url|default:'default.jpg' }}" alt="{{ item.nombre }}">
                                     <h6 class="mb-0">{{ item.nombre }}</h6>
                                     <small class="text-muted">{{ item.cantidad }} x ${{ item.precio_unitario|floatformat:0 }}</small>
                                 </div>

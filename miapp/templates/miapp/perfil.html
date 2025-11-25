@@ -381,10 +381,11 @@
                             </strong>
                             {% for detalle in pedido.detalles.all %}
                             <div class="producto-item">
+                                {% load static %}
                                 {% if detalle.producto.imagen %}
-                                <img src="{{ detalle.producto.imagen.url }}" 
-                                     alt="{{ detalle.producto.nombre }}" 
-                                     class="producto-img">
+                                <img src="{% static 'img/productos/' %}{{ detalle.producto.imagen }}" 
+                                    alt="{{ detalle.producto.nombre }}" 
+                                    class="producto-img">
                                 {% else %}
                                 <div class="producto-img" style="background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
                                     <i class="fa fa-image" style="color: #ccc;"></i>
