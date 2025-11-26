@@ -190,8 +190,9 @@
                         <div class="package-item bg-white mb-2" style="box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
                             <!-- Imagen del producto -->
                             <div style="position: relative;">
-                                <img class="img-fluid w-100" src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" 
-                                     style="height: 250px; object-fit: cover;">
+                                {% load static %}
+                                <img class="img-fluid w-100" src="{% static 'img/productos/' %}{{ producto.imagen }}" alt="{{ producto.nombre }}" 
+                                    style="height: 250px; object-fit: cover;">
                                 
                                 <!-- Badge de Top Ventas -->
                                 <div style="position: absolute; top: 10px; left: 10px; background-color: #ff6b6b; color: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 12px;">
