@@ -56,6 +56,10 @@
             margin-right: 15px;
         }
         
+        .producto-resumen .flex-grow-1 {
+            flex: 1;
+        }
+        
         .producto-resumen:last-child {
             border-bottom: none;
         }
@@ -306,8 +310,8 @@
                         <div id="productos-resumen">
                             {% for item in carrito.items %}
                             <div class="producto-resumen">
-                                {% load static %}
                                 <img src="{% static 'img/productos/' %}{{ item.imagen_url|default:'default.jpg' }}" alt="{{ item.nombre }}">
+                                <div class="flex-grow-1">
                                     <h6 class="mb-0">{{ item.nombre }}</h6>
                                     <small class="text-muted">{{ item.cantidad }} x ${{ item.precio_unitario|floatformat:0 }}</small>
                                 </div>
