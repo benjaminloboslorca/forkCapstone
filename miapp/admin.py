@@ -454,3 +454,5 @@ admin.site.index_title = "Sistema de Gestión - Dashboard"
 
 # ===== LINK AL DASHBOARD EN EL INDEX DEL ADMIN =====
 admin.site.index_template = 'admin/custom_index.html'
+
+#
