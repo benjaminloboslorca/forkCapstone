@@ -20,7 +20,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 
 # ALLOWED_HOSTS
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Agregar hosts desde variable de entorno
 env_hosts = config('ALLOWED_HOSTS', default='').strip()
